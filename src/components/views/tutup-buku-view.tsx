@@ -92,7 +92,7 @@ export function TutupBukuView() {
           <p className={pastClosing ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400'}>
             {pastClosing
               ? 'Tutup buku dilakukan setiap hari pukul 20.00 WIB. Laba bersih tiap cabang masuk ke rekap utama, dan dana operasional otomatis disisihkan untuk besok.'
-              : `Tutup buku bisa dilakukan mulai pukul 20.00 WIB. Sekarang pukul ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} WIB.`
+              : `Tutup buku bisa dilakukan mulai pukul 20.00 WIB. Sekarang pukul ${(now ?? new Date()).getHours().toString().padStart(2, '0')}:${(now ?? new Date()).getMinutes().toString().padStart(2, '0')} WIB.`
             }
           </p>
         </div>
