@@ -10,70 +10,67 @@ export async function GET(req: NextRequest) {
     const dayEnd = new Date(`${dateStr}T23:59:59.999Z`)
 
     const branches = await db.branch.findMany({ where: { isActive: true }, orderBy: { code: 'asc' } })
+    const branchIds = branches.map(b => b.id)
 
-    const branchStats = await Promise.all(
-      branches.map(async (branch) => {
-        const transactions = await db.transaction.findMany({
-          where: {
-            branchId: branch.id,
-            date: { gte: dayStart, lte: dayEnd },
-            paymentStatus: 'LUNAS',
-          },
-          include: { items: true },
+    // Batch all per-branch data in 4 parallel queries instead of N×4
+    const [allTransactions, allExpenses, allClosings, allPendingCounts] = await Promise.all([
+      db.transaction.findMany({
+        where: { branchId: { in: branchIds }, date: { gte: dayStart, lte: dayEnd }, paymentStatus: 'LUNAS' },
+        include: { items: true },
+      }),
+      db.operationalExpense.findMany({
+        where: { branchId: { in: branchIds }, date: { gte: dayStart, lte: dayEnd } },
+      }),
+      db.dailyClosing.findMany({
+        where: { branchId: { in: branchIds }, closingDate: dateFromString(dateStr) },
+      }),
+      // Aggregate pending count per branch in one query
+      db.transaction.groupBy({
+        by: ['branchId'],
+        where: { branchId: { in: branchIds }, status: 'PROSES' },
+        _count: { id: true },
+      }),
+    ])
+
+    const closingMap = new Map(allClosings.map(c => [c.branchId, c]))
+    const pendingMap = new Map(allPendingCounts.map(p => [p.branchId, p._count.id]))
+
+    const branchStats = branches.map((branch) => {
+      const transactions = allTransactions.filter(t => t.branchId === branch.id)
+      const expenses = allExpenses.filter(e => e.branchId === branch.id)
+      const grossIncome = transactions.reduce((s, t) => s + t.totalAmount, 0)
+      const transactionCount = transactions.length
+      const operationalExpenses = expenses.reduce((s, e) => s + e.amount, 0)
+      const netIncome = grossIncome - operationalExpenses
+      const closing = closingMap.get(branch.id) ?? null
+      const pendingCount = pendingMap.get(branch.id) ?? 0
+
+      // Top services today
+      const serviceMap: Record<string, { name: string; category: string; qty: number; revenue: number }> = {}
+      transactions.forEach((t) => {
+        t.items.forEach((item) => {
+          const key = `${item.serviceName}-${item.variant || ''}`
+          if (!serviceMap[key]) {
+            serviceMap[key] = { name: `${item.serviceName}${item.variant ? ` (${item.variant})` : ''}`, category: item.category, qty: 0, revenue: 0 }
+          }
+          serviceMap[key].qty += item.quantity
+          serviceMap[key].revenue += item.subtotal
         })
-
-        const grossIncome = transactions.reduce((s, t) => s + t.totalAmount, 0)
-        const transactionCount = transactions.length
-
-        const expenses = await db.operationalExpense.findMany({
-          where: {
-            branchId: branch.id,
-            date: { gte: dayStart, lte: dayEnd },
-          },
-        })
-        const operationalExpenses = expenses.reduce((s, e) => s + e.amount, 0)
-        const netIncome = grossIncome - operationalExpenses
-
-        // Check if daily closing exists
-        const closing = await db.dailyClosing.findUnique({
-          where: { branchId_closingDate: { branchId: branch.id, closingDate: dateFromString(dateStr) } },
-        })
-
-        // Pending transactions (in process, not picked up)
-        const pendingCount = await db.transaction.count({
-          where: {
-            branchId: branch.id,
-            status: 'PROSES',
-          },
-        })
-
-        // Top services today
-        const serviceMap: Record<string, { name: string; category: string; qty: number; revenue: number }> = {}
-        transactions.forEach((t) => {
-          t.items.forEach((item) => {
-            const key = `${item.serviceName}-${item.variant || ''}`
-            if (!serviceMap[key]) {
-              serviceMap[key] = { name: `${item.serviceName}${item.variant ? ` (${item.variant})` : ''}`, category: item.category, qty: 0, revenue: 0 }
-            }
-            serviceMap[key].qty += item.quantity
-            serviceMap[key].revenue += item.subtotal
-          })
-        })
-        const topServices = Object.values(serviceMap).sort((a, b) => b.revenue - a.revenue).slice(0, 5)
-
-        return {
-          branch,
-          grossIncome,
-          transactionCount,
-          operationalExpenses,
-          netIncome,
-          isClosed: !!closing,
-          closing,
-          pendingCount,
-          topServices,
-        }
       })
-    )
+      const topServices = Object.values(serviceMap).sort((a, b) => b.revenue - a.revenue).slice(0, 5)
+
+      return {
+        branch,
+        grossIncome,
+        transactionCount,
+        operationalExpenses,
+        netIncome,
+        isClosed: !!closing,
+        closing,
+        pendingCount,
+        topServices,
+      }
+    })
 
     // Main recap for the date
     const mainRecap = await db.mainRecap.findUnique({

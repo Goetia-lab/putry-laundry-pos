@@ -9,12 +9,14 @@ import { useJakartaNow } from '@/lib/api'
 import { formatTime, formatDate, getLocalDateString } from '@/lib/format'
 import { useNavStore, type ViewKey } from '@/lib/stores'
 import { cn } from '@/lib/utils'
+import { useQueryClient } from '@tanstack/react-query'
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const now = useJakartaNow()
   const isPastClosing = now ? now.getHours() >= 20 : false
   const { currentView, setView } = useNavStore()
+  const qc = useQueryClient()
 
   const bottomNav: Array<{ key: ViewKey; label: string; icon: typeof LayoutDashboard }> = [
     { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -111,6 +113,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <button
                 key={item.key}
                 onClick={() => setView(item.key)}
+                onPointerDown={() => {
+                  if (item.key === 'dashboard') qc.prefetchQuery({ queryKey: ['dashboard', undefined] })
+                  else if (item.key === 'kasir') qc.prefetchQuery({ queryKey: ['services', undefined] })
+                  else if (item.key === 'transaksi') qc.prefetchQuery({ queryKey: ['transactions', undefined] })
+                  else if (item.key === 'pricelist') qc.prefetchQuery({ queryKey: ['services', undefined] })
+                }}
                 className={cn(
                   'flex flex-1 flex-col items-center gap-0.5 py-1.5 text-xs font-medium transition-colors min-h-[44px]',
                   active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'

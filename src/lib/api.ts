@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 
 // Generic fetcher
@@ -173,6 +173,7 @@ export function useBranches() {
   return useQuery<Branch[]>({
     queryKey: ['branches'],
     queryFn: () => fetcher<{ success: boolean; data: Branch[] }>('/api/branches').then((r) => r.data),
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -183,6 +184,7 @@ export function useServices(category?: string) {
       fetcher<{ success: boolean; data: Service[] }>(
         `/api/services${category ? `?category=${category}` : ''}`
       ).then((r) => r.data),
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -196,6 +198,7 @@ export function useTransactions(params?: { branchId?: string; date?: string; sta
   return useQuery<Transaction[]>({
     queryKey: ['transactions', params],
     queryFn: () => fetcher<{ success: boolean; data: Transaction[] }>(`/api/transactions${query ? `?${query}` : ''}`).then((r) => r.data),
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -207,6 +210,7 @@ export function useExpenses(branchId?: string, date?: string) {
   return useQuery<OperationalExpense[]>({
     queryKey: ['expenses', branchId, date],
     queryFn: () => fetcher<{ success: boolean; data: OperationalExpense[] }>(`/api/expenses${query ? `?${query}` : ''}`).then((r) => r.data),
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -218,6 +222,7 @@ export function useDailyClosings(branchId?: string, date?: string) {
   return useQuery<DailyClosing[]>({
     queryKey: ['daily-closings', branchId, date],
     queryFn: () => fetcher<{ success: boolean; data: DailyClosing[] }>(`/api/daily-closing${query ? `?${query}` : ''}`).then((r) => r.data),
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -225,6 +230,7 @@ export function useMainRecaps() {
   return useQuery<MainRecap[]>({
     queryKey: ['main-recaps'],
     queryFn: () => fetcher<{ success: boolean; data: MainRecap[] }>('/api/recap').then((r) => r.data),
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -232,6 +238,7 @@ export function useDashboard(date?: string) {
   return useQuery<DashboardData>({
     queryKey: ['dashboard', date],
     queryFn: () => fetcher<{ success: boolean; data: DashboardData }>(`/api/dashboard${date ? `?date=${date}` : ''}`).then((r) => r.data),
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -242,6 +249,7 @@ export function useReport(startDate: string, endDate: string, branchId?: string)
     queryKey: ['report', startDate, endDate, branchId],
     queryFn: () => fetcher<{ success: boolean; data: ReportData }>(`/api/reports?${qs.toString()}`).then((r) => r.data),
     enabled: !!startDate && !!endDate,
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -486,6 +494,7 @@ export function useCustomers(search?: string, branchId?: string) {
   return useQuery<Customer[]>({
     queryKey: ['customers', search, branchId],
     queryFn: () => fetcher<{ success: boolean; data: Customer[] }>(`/api/customers${query ? `?${query}` : ''}`).then((r) => r.data),
+    placeholderData: keepPreviousData,
   })
 }
 

@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ThemeProvider } from 'next-themes'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Toaster } from '@/components/ui/sonner'
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -19,6 +19,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
         },
       })
   )
+
+  // Warm cache on mount — fetch essentials immediately
+  useEffect(() => {
+    queryClient.prefetchQuery({ queryKey: ['branches'] })
+    queryClient.prefetchQuery({ queryKey: ['services', undefined] })
+    queryClient.prefetchQuery({ queryKey: ['dashboard', undefined] })
+  }, [queryClient])
 
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
