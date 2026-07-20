@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
+function stripHtml(s: string): string {
+  return s.replace(/<[^>]*>/g, '')
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -37,13 +41,19 @@ export async function POST(req: NextRequest) {
     }
     const { branchId, category, description, amount, date } = body
 
-    if (!branchId || !category || !description || amount == null || isNaN(Number(amount))) {
+    if (!branchId || !category || !description || !description.trim() || amount == null || isNaN(Number(amount))) {
       return NextResponse.json({ success: false, error: 'Cabang, kategori, deskripsi, dan jumlah valid wajib diisi' }, { status: 400 })
     }
 
     const numAmount = Number(amount)
     if (numAmount < 0) {
       return NextResponse.json({ success: false, error: 'Jumlah pengeluaran tidak boleh negatif' }, { status: 400 })
+    }
+
+    // Validate branchId exists
+    const branch = await db.branch.findUnique({ where: { id: branchId } })
+    if (!branch) {
+      return NextResponse.json({ success: false, error: 'Cabang tidak ditemukan' }, { status: 404 })
     }
 
     const dateObj = date ? new Date(date) : new Date()
@@ -54,8 +64,8 @@ export async function POST(req: NextRequest) {
     const expense = await db.operationalExpense.create({
       data: {
         branchId,
-        category,
-        description,
+        category: stripHtml(category),
+        description: stripHtml(description),
         amount: numAmount,
         date: dateObj,
       },

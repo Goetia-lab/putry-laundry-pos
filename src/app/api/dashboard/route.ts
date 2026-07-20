@@ -88,20 +88,32 @@ export async function GET(req: NextRequest) {
     const allClosed = branchStats.every((b) => b.isClosed)
     const operationalFundTotal = branches.reduce((s, b) => s + b.operationalFundAmount, 0)
 
-    // 7-day trend
+    // 7-day trend — batched into 2 queries instead of 14
+    const trendStart = new Date()
+    trendStart.setDate(trendStart.getDate() - 6)
+    const trendStartStr = trendStart.toISOString().slice(0, 10)
+    const trendEndStr = getLocalDateString()
+    const trendDayStart = new Date(`${trendStartStr}T00:00:00.000Z`)
+    const trendDayEnd = new Date(`${trendEndStr}T23:59:59.999Z`)
+
+    const [allDayTx, allDayExp] = await Promise.all([
+      db.transaction.findMany({
+        where: { date: { gte: trendDayStart, lte: trendDayEnd }, paymentStatus: 'LUNAS' },
+        select: { date: true, totalAmount: true },
+      }),
+      db.operationalExpense.findMany({
+        where: { date: { gte: trendDayStart, lte: trendDayEnd } },
+        select: { date: true, amount: true },
+      }),
+    ])
+
     const trend: Array<{ date: string; gross: number; expenses: number; net: number; count: number }> = []
     for (let i = 6; i >= 0; i--) {
       const d = new Date()
       d.setDate(d.getDate() - i)
       const dStr = d.toISOString().slice(0, 10)
-      const dStart = new Date(`${dStr}T00:00:00.000Z`)
-      const dEnd = new Date(`${dStr}T23:59:59.999Z`)
-      const dayTx = await db.transaction.findMany({
-        where: { date: { gte: dStart, lte: dEnd }, paymentStatus: 'LUNAS' },
-      })
-      const dayExp = await db.operationalExpense.findMany({
-        where: { date: { gte: dStart, lte: dEnd } },
-      })
+      const dayTx = allDayTx.filter((t) => t.date.toISOString().slice(0, 10) === dStr)
+      const dayExp = allDayExp.filter((e) => e.date.toISOString().slice(0, 10) === dStr)
       const gross = dayTx.reduce((s, t) => s + t.totalAmount, 0)
       const exp = dayExp.reduce((s, e) => s + e.amount, 0)
       trend.push({ date: dStr, gross, expenses: exp, net: gross - exp, count: dayTx.length })
