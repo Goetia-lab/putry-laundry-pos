@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { useServices, useBranches, useCreateTransaction, useCreateCustomer, useCustomers } from '@/lib/api'
 import { useCartStore } from '@/lib/stores'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -46,6 +47,8 @@ export function KasirView() {
   const [notes, setNotes] = useState('')
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [lastInvoice, setLastInvoice] = useState<{ invoiceNo: string; total: number; paid: number; change: number; customerName: string; items: Array<{ variant?: string | null }> } | null>(null)
+  const isMobile = useIsMobile()
+  const [mobileTab, setMobileTab] = useState<'services' | 'cart'>('services')
 
   const { data: customers } = useCustomers(customerSearch || undefined)
 
@@ -181,9 +184,31 @@ export function KasirView() {
         }
       />
 
+      {/* Mobile tabs */}
+      {isMobile && (
+        <div className="mb-4 flex gap-0 rounded-xl border bg-card p-1 sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <button
+            onClick={() => setMobileTab('services')}
+            className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+              mobileTab === 'services' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Pilih Layanan
+          </button>
+          <button
+            onClick={() => setMobileTab('cart')}
+            className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors relative ${
+              mobileTab === 'cart' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Keranjang{items.length > 0 && <span className="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary/20 px-1.5 text-xs font-bold">{items.length}</span>}
+          </button>
+        </div>
+      )}
+
       <div className="grid gap-4 lg:grid-cols-[1fr_400px]">
         {/* Service catalog */}
-        <div className="space-y-4">
+        <div className={isMobile && mobileTab === 'cart' ? 'hidden' : 'space-y-4'}>
           {/* Search & filter */}
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
@@ -270,7 +295,7 @@ export function KasirView() {
         </div>
 
         {/* Cart */}
-        <Card className="lg:sticky lg:top-20 lg:h-[calc(100vh-7rem)] lg:flex lg:flex-col">
+        <Card className={`${isMobile && mobileTab === 'services' ? 'hidden' : ''} lg:sticky lg:top-20 lg:h-[calc(100vh-7rem)] lg:flex lg:flex-col lg:block`}>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base">

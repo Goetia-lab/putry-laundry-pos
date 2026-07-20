@@ -134,9 +134,9 @@ export function TransaksiView() {
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-3 sm:flex-col sm:items-end">
+                <div className="flex items-center gap-3 md:flex-col md:items-end">
                   <p className="text-lg font-bold tabular-nums">{formatRupiah(t.totalAmount)}</p>
-                  <div className="flex gap-1.5">
+                  <div className="flex flex-wrap gap-1.5">
                     {t.status === 'PROSES' && (
                       <Button size="sm" variant="outline" className="h-7 gap-1 text-xs" onClick={() => handleQuickStatus(t.id, 'SELESAI')}>
                         <Check className="h-3 w-3" /> Selesai

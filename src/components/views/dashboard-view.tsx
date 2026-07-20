@@ -9,11 +9,11 @@ import { Separator } from '@/components/ui/separator'
 import { StatCard, PageHeader, EmptyState } from '@/components/shared/ui-bits'
 import { useNavStore } from '@/lib/stores'
 import { formatRupiah, formatCompactRupiah, formatDate, formatTime, getLocalDateString, buildWhatsAppUrl, formatEstimatedDate } from '@/lib/format'
-import {
-  Wallet, TrendingUp, Receipt, Building2, Lock, ArrowRight,
+import { Wallet, TrendingUp, Receipt, Building2, Lock, ArrowRight,
   Package, Clock, CheckCircle2, AlertCircle, Droplets, Banknote,
   Calendar, Bell, History, ShoppingBag, Phone, MessageCircle, Tag,
 } from 'lucide-react'
+import { useIsMobile } from '@/hooks/use-mobile'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, AreaChart, Area,
@@ -24,6 +24,8 @@ const PIE_COLORS = ['oklch(0.62 0.14 165)', 'oklch(0.7 0.15 80)', 'oklch(0.65 0.
 export function DashboardView() {
   const { data, isLoading } = useDashboard()
   const { setView } = useNavStore()
+  const isMobile = useIsMobile()
+  const chartH = isMobile ? 180 : 260
 
   if (isLoading || !data) {
     return (
@@ -118,7 +120,7 @@ export function DashboardView() {
             </div>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={260}>
+            <ResponsiveContainer width="100%" height={chartH}>
               <AreaChart data={data.weeklyTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="grossGrad" x1="0" y1="0" x2="0" y2="1">
