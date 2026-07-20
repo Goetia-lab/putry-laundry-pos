@@ -10,6 +10,9 @@ const globalForPrisma = globalThis as unknown as {
 function ensurePoolParams() {
   const raw = process.env.DATABASE_URL
   if (!raw) return
+  // Only patch PostgreSQL URLs. SQLite (file:./...) dan datasource non-postgres
+  // akan rusak kalau dipaksa pake query string PgBouncer — skip mereka.
+  if (!raw.startsWith('postgres')) return
   // Skip if already tagged
   if (/\bpgbouncer=true\b/.test(raw)) return
   const [base, qs] = raw.split('?')
