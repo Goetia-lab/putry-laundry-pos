@@ -3,7 +3,7 @@
     "putry-laundry-pos": {
       "root": ".",
       "framework": "nextjs",
-      "buildCommand": "npm install && npx prisma generate && npm run build:prod"
+      "buildCommand": "prisma generate && next build"
     }
   },
   "rewrites": [
