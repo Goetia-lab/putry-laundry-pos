@@ -174,6 +174,8 @@ export function useBranches() {
     queryKey: ['branches'],
     queryFn: () => fetcher<{ success: boolean; data: Branch[] }>('/api/branches').then((r) => r.data),
     placeholderData: keepPreviousData,
+    // Data cabang jarang berubah → cache lebih agresif supaya pindah halaman gak refetch.
+    staleTime: 30 * 60 * 1000,
   })
 }
 
@@ -185,6 +187,8 @@ export function useServices(category?: string) {
         `/api/services${category ? `?category=${category}` : ''}`
       ).then((r) => r.data),
     placeholderData: keepPreviousData,
+    // Daftar layanan jarang berubah → cache lebih agresif supaya pindah halaman gak refetch.
+    staleTime: 30 * 60 * 1000,
   })
 }
 

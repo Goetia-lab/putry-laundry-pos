@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
     const allClosed = branchStats.every((b) => b.isClosed)
     const operationalFundTotal = branches.reduce((s, b) => s + b.operationalFundAmount, 0)
 
-    // 7-day trend — batched into 2 queries instead of 14
+    // 7-day trend window (range computed up-front so the queries below can run in parallel)
     const trendStart = new Date()
     trendStart.setDate(trendStart.getDate() - 6)
     const trendStartStr = trendStart.toISOString().slice(0, 10)
@@ -93,7 +93,9 @@ export async function GET(req: NextRequest) {
     const trendDayStart = new Date(`${trendStartStr}T00:00:00.000Z`)
     const trendDayEnd = new Date(`${trendEndStr}T23:59:59.999Z`)
 
-    const [allDayTx, allDayExp] = await Promise.all([
+    // Run all remaining DB queries in parallel — they don't depend on each other.
+    // (Sebelumnya: mainRecap + trend(2) + recent + pending + ready berjalan sequential.)
+    const [allDayTx, allDayExp, recentTransactions, pendingOrders, readyForPickup] = await Promise.all([
       db.transaction.findMany({
         where: { date: { gte: trendDayStart, lte: trendDayEnd }, paymentStatus: 'LUNAS' },
         select: { date: true, totalAmount: true },
@@ -101,6 +103,24 @@ export async function GET(req: NextRequest) {
       db.operationalExpense.findMany({
         where: { date: { gte: trendDayStart, lte: trendDayEnd } },
         select: { date: true, amount: true },
+      }),
+      db.transaction.findMany({
+        where: { date: { gte: dayStart, lte: dayEnd } },
+        orderBy: { date: 'desc' },
+        take: 5,
+        include: { branch: true, items: true },
+      }),
+      db.transaction.findMany({
+        where: { status: 'PROSES' },
+        orderBy: { date: 'asc' },
+        take: 10,
+        include: { branch: true, items: true },
+      }),
+      db.transaction.findMany({
+        where: { status: 'SELESAI' },
+        orderBy: { date: 'asc' },
+        take: 10,
+        include: { branch: true, items: true },
       }),
     ])
 
@@ -115,32 +135,6 @@ export async function GET(req: NextRequest) {
       const exp = dayExp.reduce((s, e) => s + e.amount, 0)
       trend.push({ date: dStr, gross, expenses: exp, net: gross - exp, count: dayTx.length })
     }
-
-    // Recent transactions (last 5 today)
-    const recentTransactions = await db.transaction.findMany({
-      where: {
-        date: { gte: dayStart, lte: dayEnd },
-      },
-      orderBy: { date: 'desc' },
-      take: 5,
-      include: { branch: true, items: true },
-    })
-
-    // Pending orders (PROSES status, ready for pickup soon)
-    const pendingOrders = await db.transaction.findMany({
-      where: { status: 'PROSES' },
-      orderBy: { date: 'asc' },
-      take: 10,
-      include: { branch: true, items: true },
-    })
-
-    // Ready for pickup (SELESAI status, not yet picked up)
-    const readyForPickup = await db.transaction.findMany({
-      where: { status: 'SELESAI' },
-      orderBy: { date: 'asc' },
-      take: 10,
-      include: { branch: true, items: true },
-    })
 
 
     return NextResponse.json({

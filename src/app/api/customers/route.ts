@@ -30,21 +30,28 @@ export async function GET(req: NextRequest) {
       take: 100,
     })
 
-    // Aggregate total spent per customer
-    const customersWithStats = await Promise.all(
-      customers.map(async (c) => {
-        const stats = await db.transaction.aggregate({
-          where: { customerId: c.id, paymentStatus: 'LUNAS' },
-          _sum: { totalAmount: true },
-          _count: true,
-        })
-        return {
-          ...c,
-          totalSpent: stats._sum.totalAmount ?? 0,
-          transactionCount: stats._count,
-        }
-      })
-    )
+    // Aggregate total spent per customer in ONE grouped query instead of N+1
+    // (sebelumnya: 1 aggregate per customer → up to 100 round-trip ke DB).
+    const customerIds = customers.map((c) => c.id)
+    const stats =
+      customerIds.length > 0
+        ? await db.transaction.groupBy({
+            by: ['customerId'],
+            where: { customerId: { in: customerIds }, paymentStatus: 'LUNAS' },
+            _sum: { totalAmount: true },
+            _count: { id: true },
+          })
+        : []
+    const statsMap = new Map(stats.map((s) => [s.customerId, s]))
+
+    const customersWithStats = customers.map((c) => {
+      const s = statsMap.get(c.id)
+      return {
+        ...c,
+        totalSpent: s?._sum.totalAmount ?? 0,
+        transactionCount: s?._count.id ?? 0,
+      }
+    })
 
     return NextResponse.json({ success: true, data: customersWithStats })
   } catch (error) {
