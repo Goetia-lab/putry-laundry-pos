@@ -18,7 +18,12 @@ function getPoolUrl(): string {
   return base + '?' + p.toString()
 }
 
-const adapter = new PrismaPg({ connectionString: getPoolUrl() })
+const adapter = new PrismaPg({
+  connectionString: getPoolUrl(),
+  max: 1,            // 1 connection per serverless instance — fits Supabase 5-slot pool
+  idleTimeoutMillis: 5_000,   // free idle conns fast
+  connectionTimeoutMillis: 10_000,
+})
 
 export const db =
   globalForPrisma.prisma ??
