@@ -30,7 +30,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       where: { id },
       data: {
         ...(name !== undefined && { name }),
-        ...(code !== undefined && { code: code.toUpperCase() }),
+        ...(code !== undefined && { code: String(code).toUpperCase() }),
         ...(address !== undefined && { address }),
         ...(phone !== undefined && { phone }),
         ...(operationalFundAmount !== undefined && { operationalFundAmount: Number(operationalFundAmount) }),
