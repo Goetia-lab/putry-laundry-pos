@@ -26,16 +26,17 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }
     const { name, code, address, phone, operationalFundAmount, isActive } = body
 
+    const data: Record<string, unknown> = {}
+    if (name !== undefined) data.name = name
+    if (code !== undefined) data.code = String(code).toUpperCase()
+    if (address !== undefined) data.address = address
+    if (phone !== undefined) data.phone = phone
+    if (operationalFundAmount !== undefined) data.operationalFundAmount = Number(operationalFundAmount)
+    if (isActive !== undefined) data.isActive = isActive
+
     const branch = await db.branch.update({
       where: { id },
-      data: {
-        ...(name !== undefined && { name }),
-        ...(code !== undefined && { code: String(code).toUpperCase() }),
-        ...(address !== undefined && { address }),
-        ...(phone !== undefined && { phone }),
-        ...(operationalFundAmount !== undefined && { operationalFundAmount: Number(operationalFundAmount) }),
-        ...(isActive !== undefined && { isActive }),
-      },
+      data: data as any,
     })
     return NextResponse.json({ success: true, data: branch })
   } catch (error) {
