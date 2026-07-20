@@ -1,25 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Prisma } from '@prisma/client'
 import { db } from '@/lib/db'
 import { getLocalDateString, dateFromString } from '@/lib/format'
-
-// Helper: enrich transactions with discount fields via raw SQL (dev server cache workaround)
-async function enrichWithDiscountFields(transactions: Array<{ id: string }>) {
-  if (transactions.length === 0) return
-  const ids = transactions.map((t) => t.id)
-  const discountData = await db.$queryRaw<Array<{ id: string; subtotal: number | null; discountPercent: number | null; discountAmount: number | null }>>`
-    SELECT id, subtotal, discountPercent, discountAmount FROM "Transaction" WHERE id IN (${Prisma.join(ids)})
-  `
-  const discountMap = new Map(discountData.map((d) => [d.id, d]))
-  transactions.forEach((t: any) => {
-    const d = discountMap.get(t.id)
-    if (d) {
-      t.subtotal = d.subtotal ?? 0
-      t.discountPercent = d.discountPercent ?? 0
-      t.discountAmount = d.discountAmount ?? 0
-    }
-  })
-}
 
 export async function GET(req: NextRequest) {
   try {
@@ -152,10 +133,6 @@ export async function GET(req: NextRequest) {
       include: { branch: true, items: true },
     })
 
-    // Enrich with discount fields (dev server cache workaround)
-    await enrichWithDiscountFields(recentTransactions)
-    await enrichWithDiscountFields(pendingOrders)
-    await enrichWithDiscountFields(readyForPickup)
 
     return NextResponse.json({
       success: true,

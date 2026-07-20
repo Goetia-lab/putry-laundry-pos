@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Prisma } from '@prisma/client'
 import { db } from '@/lib/db'
 import { getLocalDateString } from '@/lib/format'
 
@@ -30,24 +29,7 @@ export async function GET(req: NextRequest) {
       },
     })
 
-    // Fetch discount fields via raw SQL (dev server has old Prisma Client cached)
-    if (transactions.length > 0) {
-      const ids = transactions.map((t) => t.id)
-      const discountData = await db.$queryRaw<Array<{ id: string; subtotal: number | null; discountPercent: number | null; discountAmount: number | null }>>`
-        SELECT id, subtotal, discountPercent, discountAmount FROM "Transaction" WHERE id IN (${Prisma.join(ids)})
-      `
-      const discountMap = new Map(discountData.map((d) => [d.id, d]))
-      transactions.forEach((t) => {
-        const d = discountMap.get(t.id)
-        if (d) {
-          ;(t as any).subtotal = d.subtotal ?? 0
-          ;(t as any).discountPercent = d.discountPercent ?? 0
-          ;(t as any).discountAmount = d.discountAmount ?? 0
-        }
-      })
-    }
-
-    return NextResponse.json({ success: true, data: transactions })
+        return NextResponse.json({ success: true, data: transactions })
   } catch (error) {
     console.error('GET /api/transactions error:', error)
     return NextResponse.json({ success: false, error: 'Gagal memuat transaksi' }, { status: 500 })
@@ -105,6 +87,9 @@ export async function POST(req: NextRequest) {
         pickupDate: pickupDate ? new Date(pickupDate) : null,
         status: 'PROSES',
         paymentStatus: paymentStatus || 'LUNAS',
+        subtotal,
+        discountPercent: discountPct,
+        discountAmount,
         totalAmount,
         paidAmount: paid,
         changeAmount: change,
@@ -128,14 +113,7 @@ export async function POST(req: NextRequest) {
       },
     })
 
-    // Update discount fields via raw SQL (dev server has old Prisma Client cached)
-    if (discountPct > 0) {
-      await db.$executeRaw`UPDATE "Transaction" SET subtotal = ${subtotal}, discountPercent = ${discountPct}, discountAmount = ${discountAmount} WHERE id = ${transaction.id}`
-      ;(transaction as any).subtotal = subtotal
-      ;(transaction as any).discountPercent = discountPct
-      ;(transaction as any).discountAmount = discountAmount
-    }
-
+    
     return NextResponse.json({ success: true, data: transaction })
   } catch (error) {
     console.error('POST /api/transactions error:', error)

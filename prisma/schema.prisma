@@ -1,12 +1,13 @@
-// Prisma schema for Laundry POS - 2 cabang with daily closing & main recap
+// Prisma schema for Putry Laundry POS - PostgreSQL version (Supabase)
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Branch {
@@ -15,7 +16,7 @@ model Branch {
   code                  String   @unique
   address               String?
   phone                 String?
-  operationalFundAmount Int      @default(50000) // dana operasional disisihkan tiap hari untuk besok
+  operationalFundAmount Int      @default(50000)
   isActive              Boolean  @default(true)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
@@ -29,12 +30,12 @@ model Branch {
 
 model Service {
   id        String   @id @default(cuid())
-  category  String // Jasa, Sepatu, Gorden, Selimut, Bed Cover, Lain-lain
-  name      String // Cuci Kering, Sneakers, dll
-  variant   String? // Reguler, Express (null jika tidak ada varian)
+  category  String
+  name      String
+  variant   String?
   price     Int
-  unit      String // KG, PSG, PCS, M2
-  duration  String? // "2-3 Hari", "24 Jam"
+  unit      String
+  duration  String?
   isActive  Boolean  @default(true)
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
@@ -63,13 +64,13 @@ model Transaction {
   customerName String
   customerPhone String?
   date         DateTime @default(now())
-  pickupDate   DateTime? // tanggal pengambilan
-  status       String   @default("PROSES") // PROSES, SELESAI, DIAMBIL
-  paymentStatus String  @default("LUNAS") // LUNAS, BELUM_BAYAR
-  subtotal     Int      @default(0) // total sebelum diskon
-  discountPercent Int   @default(0) // persentase diskon loyalty
-  discountAmount Int    @default(0) // nominal diskon
-  totalAmount  Int // total setelah diskon
+  pickupDate   DateTime?
+  status       String   @default("PROSES")
+  paymentStatus String  @default("LUNAS")
+  subtotal     Int      @default(0)
+  discountPercent Int   @default(0)
+  discountAmount Int    @default(0)
+  totalAmount  Int
   paidAmount   Int      @default(0)
   changeAmount Int      @default(0)
   notes        String?
@@ -102,7 +103,7 @@ model OperationalExpense {
   id        String   @id @default(cuid())
   branchId  String
   date      DateTime @default(now())
-  category  String // LISTRIK, AIR, GAS, BENIH, DETERGEN, LAINNYA, GAJI
+  category  String
   description String
   amount    Int
   createdAt DateTime @default(now())
@@ -113,15 +114,15 @@ model OperationalExpense {
 model DailyClosing {
   id                     String   @id @default(cuid())
   branchId               String
-  date                   DateTime @unique // per cabang? no - need compound. Use date+branch unique via closingDate
-  closingDate            DateTime // tanggal tutup buku (tanggal lokal)
-  grossIncome            Int // total pendapatan kotor dari transaksi
+  date                   DateTime
+  closingDate            DateTime
+  grossIncome            Int
   transactionCount       Int
-  operationalExpenses    Int // total pengeluaran operasional hari itu
-  netIncome              Int // gross - expenses
-  transferredToMain      Int // net yang masuk ke rekap utama (= netIncome)
-  operationalFundRetained Int // dana operasional disisihkan untuk besok
-  status                 String   @default("CLOSED") // CLOSED, OPEN
+  operationalExpenses    Int
+  netIncome              Int
+  transferredToMain      Int
+  operationalFundRetained Int
+  status                 String   @default("CLOSED")
   closingTime            DateTime @default(now())
   notes                  String?
   createdAt              DateTime @default(now())
@@ -133,12 +134,12 @@ model DailyClosing {
 
 model MainRecap {
   id               String   @id @default(cuid())
-  recapDate        DateTime @unique // tanggal rekap (tanggal lokal)
-  totalGrossIncome Int // total gross dari semua cabang
-  totalExpenses    Int // total pengeluaran semua cabang
-  totalNetIncome   Int // total net
-  totalOperationalFundDisbursed Int // total dana operasional dikembalikan ke cabang
-  grandTotal       Int // net masuk ke kas utama = totalNet - totalOperationalFundDisbursed
+  recapDate        DateTime @unique
+  totalGrossIncome Int
+  totalExpenses    Int
+  totalNetIncome   Int
+  totalOperationalFundDisbursed Int
+  grandTotal       Int
   status           String   @default("CLOSED")
   notes            String?
   createdAt        DateTime @default(now())
@@ -154,7 +155,7 @@ model MainRecapEntry {
   expenses    Int
   netIncome   Int
   operationalFundDisbursed Int
-  netToMain   Int // netIncome - operationalFundDisbursed
+  netToMain   Int
 
   recap  MainRecap @relation(fields: [recapId], references: [id], onDelete: Cascade)
   branch Branch    @relation(fields: [branchId], references: [id])
