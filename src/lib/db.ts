@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
@@ -7,9 +8,7 @@ const globalForPrisma = globalThis as unknown as {
 function getPoolUrl(): string {
   const raw = process.env.DATABASE_URL || ''
   if (!raw) return raw
-  // Only patch PostgreSQL URLs — skip SQLite
   if (!raw.startsWith('postgres')) return raw
-  // Already tagged — return as-is
   if (/\bpgbouncer=true\b/.test(raw)) return raw
   const [base, qs] = raw.split('?')
   const p = new URLSearchParams(qs || '')
@@ -19,10 +18,12 @@ function getPoolUrl(): string {
   return base + '?' + p.toString()
 }
 
+const adapter = new PrismaPg({ connectionString: getPoolUrl() })
+
 export const db =
   globalForPrisma.prisma ??
   new PrismaClient({
-    datasources: { db: { url: getPoolUrl() } },
+    adapter,
     log: process.env.NODE_ENV === 'production' ? ['error', 'warn'] : ['query', 'error', 'warn'],
   })
 
