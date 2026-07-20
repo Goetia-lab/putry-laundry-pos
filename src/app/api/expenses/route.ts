@@ -29,7 +29,12 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
+    let body: any
+    try {
+      body = await req.json()
+    } catch {
+      return NextResponse.json({ success: false, error: 'Format JSON tidak valid' }, { status: 400 })
+    }
     const { branchId, category, description, amount, date } = body
 
     if (!branchId || !category || !description || amount == null || isNaN(Number(amount))) {

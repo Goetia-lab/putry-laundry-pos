@@ -20,7 +20,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    let body: Record<string, unknown>
+    let body: any
     try {
       body = await req.json()
     } catch {
