@@ -2,6 +2,7 @@
 
 import { useNavStore, type ViewKey } from '@/lib/stores'
 import { useBranches } from '@/lib/api'
+import { useQueryClient } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -37,6 +38,23 @@ const navItems: Array<{ key: ViewKey; label: string; icon: typeof LayoutDashboar
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const { currentView, setView } = useNavStore()
   const { data: branches } = useBranches()
+  const qc = useQueryClient()
+
+  const prefetch = (key: ViewKey) => {
+    const map: Record<string, [string, string?]> = {
+      dashboard: ['dashboard'],
+      kasir: ['services'],
+      transaksi: ['transactions'],
+      pricelist: ['services'],
+      pelanggan: ['customers'],
+      cabang: ['branches'],
+      tutupbuku: ['daily-closings'],
+      rekap: ['main-recaps'],
+      laporan: ['report'],
+    }
+    const [qk] = map[key]
+    if (qk) qc.prefetchQuery({ queryKey: [qk] })
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -69,6 +87,8 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
                   setView(item.key)
                   onNavigate?.()
                 }}
+                onMouseEnter={() => prefetch(item.key)}
+                onFocus={() => prefetch(item.key)}
                 className={cn(
                   'group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
                   active

@@ -1,17 +1,19 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { AppShell } from '@/components/layout/app-shell'
 import { useNavStore } from '@/lib/stores'
-import { DashboardView } from '@/components/views/dashboard-view'
-import { KasirView } from '@/components/views/kasir-view'
-import { PricelistView } from '@/components/views/pricelist-view'
-import { CabangView } from '@/components/views/cabang-view'
-import { TutupBukuView } from '@/components/views/tutup-buku-view'
-import { RekapView } from '@/components/views/rekap-view'
-import { LaporanView } from '@/components/views/laporan-view'
-import { TransaksiView } from '@/components/views/transaksi-view'
-import { PelangganView } from '@/components/views/pelanggan-view'
 import { Suspense } from 'react'
+
+const DashboardView = dynamic(() => import('@/components/views/dashboard-view').then(m => ({ default: m.DashboardView })))
+const KasirView = dynamic(() => import('@/components/views/kasir-view').then(m => ({ default: m.KasirView })))
+const PricelistView = dynamic(() => import('@/components/views/pricelist-view').then(m => ({ default: m.PricelistView })))
+const CabangView = dynamic(() => import('@/components/views/cabang-view').then(m => ({ default: m.CabangView })))
+const TutupBukuView = dynamic(() => import('@/components/views/tutup-buku-view').then(m => ({ default: m.TutupBukuView })))
+const RekapView = dynamic(() => import('@/components/views/rekap-view').then(m => ({ default: m.RekapView })))
+const LaporanView = dynamic(() => import('@/components/views/laporan-view').then(m => ({ default: m.LaporanView })))
+const TransaksiView = dynamic(() => import('@/components/views/transaksi-view').then(m => ({ default: m.TransaksiView })))
+const PelangganView = dynamic(() => import('@/components/views/pelanggan-view').then(m => ({ default: m.PelangganView })))
 
 export default function Home() {
   const { currentView } = useNavStore()
