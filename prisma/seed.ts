@@ -1,9 +1,14 @@
 import { db } from '../src/lib/db'
 
+// Idempotent seed: aman dijalankan berkali-kali.
+// - Branch pakai upsert (field `code` unik).
+// - Service pakai findFirst(category+name+variant) lalu update/create.
+//   Tidak ada unique constraint di model Service selain `id`, jadi kita
+//   cocokkan berdasarkan kombinasi category+name+variant agar tidak duplikat.
 async function main() {
-  // Create 2 branches
-  const cabangA = await db.branch.create({
-    data: {
+  // ── Branches ───────────────────────────────────────────────────────
+  const branches = [
+    {
       name: 'Cabang A - Pusat',
       code: 'A',
       address: 'Jl. Merdeka No. 123',
@@ -11,10 +16,7 @@ async function main() {
       operationalFundAmount: 50000,
       isActive: true,
     },
-  })
-
-  const cabangB = await db.branch.create({
-    data: {
+    {
       name: 'Cabang B - Cabang',
       code: 'B',
       address: 'Jl. Sudirman No. 456',
@@ -22,10 +24,24 @@ async function main() {
       operationalFundAmount: 50000,
       isActive: true,
     },
-  })
+  ]
 
-  console.log('Branches created:', cabangA.name, cabangB.name)
+  for (const b of branches) {
+    await db.branch.upsert({
+      where: { code: b.code },
+      update: {
+        name: b.name,
+        address: b.address,
+        phone: b.phone,
+        operationalFundAmount: b.operationalFundAmount,
+        isActive: b.isActive,
+      },
+      create: b,
+    })
+  }
+  console.log(`✓ Branches synced: ${branches.map((b) => b.code).join(', ')}`)
 
+  // ── Services ───────────────────────────────────────────────────────
   // Pricelist services from the photo
   const services = [
     // Jasa - Reguler & Express
@@ -58,10 +74,21 @@ async function main() {
     { category: 'Lain-lain', name: 'Boneka', variant: null, price: 0, unit: 'PCS', duration: null, sortOrder: 22 },
   ]
 
+  let created = 0
+  let updated = 0
   for (const svc of services) {
-    await db.service.create({ data: svc })
+    const existing = await db.service.findFirst({
+      where: { category: svc.category, name: svc.name, variant: svc.variant ?? null },
+    })
+    if (existing) {
+      await db.service.update({ where: { id: existing.id }, data: svc })
+      updated++
+    } else {
+      await db.service.create({ data: svc })
+      created++
+    }
   }
-  console.log(`Created ${services.length} services`)
+  console.log(`✓ Services: ${created} created, ${updated} updated (total ${services.length})`)
 }
 
 main()

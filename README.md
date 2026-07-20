@@ -129,15 +129,23 @@ Buka [http://localhost:3000](http://localhost:3000) di browser.
 
 ## 📦 Deployment
 
-Untuk deploy ke **Supabase (database) + Render (hosting)**, baca panduan lengkap di:
+Ada **2 opsi** hosting, keduanya gratis untuk mulai (pakai Supabase untuk database):
 
+### 🟢 Opsi 1: Vercel + Supabase (Recommended — paling mudah)
+Panduan super komprehensif step-by-step untuk pemula:
+📄 **[VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md)**
+
+Cepat: Vercel import dari GitHub → auto-deploy → URL online dalam 5 menit.
+
+### 🟡 Opsi 2: Render + Supabase
+Panduan lengkap alternatif (pakai Docker/standalone server):
 📄 **[DEPLOYMENT.md](./DEPLOYMENT.md)**
 
-Ringkasannya:
+Ringkasannya (berlaku kedua opsi):
 1. Buat project Supabase → dapat connection string PostgreSQL
 2. Ganti `prisma/schema.prisma` dengan versi postgres: `cp prisma/schema.postgres.prisma prisma/schema.prisma`
 3. Push code ke GitHub
-4. Connect repo di Render → set env vars → deploy
+4. Connect repo di Vercel/Render → set env vars (`DATABASE_URL`, `DIRECT_URL`) → deploy
 
 ---
 

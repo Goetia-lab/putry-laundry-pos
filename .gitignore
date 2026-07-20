@@ -56,9 +56,11 @@ server.log
 # Skills directory
 /skills/
 
-# Database (SQLite local dev)
-/db/*.db
-/db/*.db-journal
+# Database (SQLite local dev) — ignore *.db anywhere in the repo
+# (Prisma creates the file relative to the schema dir, so it can land in
+# prisma/db/ — match both root db/ and prisma/db/)
+*.db
+*.db-journal
 
 # Build output
 /standalone
