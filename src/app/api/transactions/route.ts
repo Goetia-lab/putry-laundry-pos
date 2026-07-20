@@ -38,7 +38,12 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
+    let body: Record<string, unknown>
+    try {
+      body = await req.json()
+    } catch {
+      return NextResponse.json({ success: false, error: 'Format JSON tidak valid' }, { status: 400 })
+    }
     const { branchId, customerId, customerName, customerPhone, items, paymentStatus, paidAmount, notes, pickupDate, discountPercent } = body
 
     if (!branchId || !customerName || !items || items.length === 0) {
@@ -48,6 +53,11 @@ export async function POST(req: NextRequest) {
     const branch = await db.branch.findUnique({ where: { id: branchId } })
     if (!branch) {
       return NextResponse.json({ success: false, error: 'Cabang tidak ditemukan' }, { status: 404 })
+    }
+
+    // Validate items
+    if (items.some((item: any) => isNaN(Number(item.price)) || isNaN(Number(item.quantity)))) {
+      return NextResponse.json({ success: false, error: 'Harga dan quantity item harus angka valid' }, { status: 400 })
     }
 
     // Calculate subtotal (before discount)
@@ -113,7 +123,6 @@ export async function POST(req: NextRequest) {
       },
     })
 
-    
     return NextResponse.json({ success: true, data: transaction })
   } catch (error) {
     console.error('POST /api/transactions error:', error)

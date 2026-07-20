@@ -32,8 +32,18 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { branchId, category, description, amount, date } = body
 
-    if (!branchId || !category || !description || amount === undefined) {
-      return NextResponse.json({ success: false, error: 'Cabang, kategori, deskripsi, dan jumlah wajib diisi' }, { status: 400 })
+    if (!branchId || !category || !description || amount == null || isNaN(Number(amount))) {
+      return NextResponse.json({ success: false, error: 'Cabang, kategori, deskripsi, dan jumlah valid wajib diisi' }, { status: 400 })
+    }
+
+    const numAmount = Number(amount)
+    if (numAmount < 0) {
+      return NextResponse.json({ success: false, error: 'Jumlah pengeluaran tidak boleh negatif' }, { status: 400 })
+    }
+
+    const dateObj = date ? new Date(date) : new Date()
+    if (isNaN(dateObj.getTime())) {
+      return NextResponse.json({ success: false, error: 'Format tanggal tidak valid' }, { status: 400 })
     }
 
     const expense = await db.operationalExpense.create({
@@ -41,8 +51,8 @@ export async function POST(req: NextRequest) {
         branchId,
         category,
         description,
-        amount: Number(amount),
-        date: date ? new Date(date) : new Date(),
+        amount: numAmount,
+        date: dateObj,
       },
       include: { branch: true },
     })

@@ -20,14 +20,19 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
+    let body: Record<string, unknown>
+    try {
+      body = await req.json()
+    } catch {
+      return NextResponse.json({ success: false, error: 'Format JSON tidak valid' }, { status: 400 })
+    }
     const { name, code, address, phone, operationalFundAmount } = body
 
     if (!name || !code) {
       return NextResponse.json({ success: false, error: 'Nama dan kode cabang wajib diisi' }, { status: 400 })
     }
 
-    const existing = await db.branch.findUnique({ where: { code: code.toUpperCase() } })
+    const existing = await db.branch.findUnique({ where: { code: String(code).toUpperCase() } })
     if (existing) {
       return NextResponse.json({ success: false, error: 'Kode cabang sudah digunakan' }, { status: 400 })
     }
@@ -35,10 +40,10 @@ export async function POST(req: NextRequest) {
     const branch = await db.branch.create({
       data: {
         name,
-        code: code.toUpperCase(),
+        code: String(code).toUpperCase(),
         address: address || null,
         phone: phone || null,
-        operationalFundAmount: operationalFundAmount ?? 50000,
+        operationalFundAmount: Number(operationalFundAmount) || 50000,
       },
     })
     return NextResponse.json({ success: true, data: branch })

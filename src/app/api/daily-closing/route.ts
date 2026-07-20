@@ -27,7 +27,12 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
+    let body: Record<string, unknown>
+    try {
+      body = await req.json()
+    } catch {
+      return NextResponse.json({ success: false, error: 'Format JSON tidak valid' }, { status: 400 })
+    }
     const { branchId, date, notes } = body
 
     if (!branchId) {

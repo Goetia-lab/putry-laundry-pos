@@ -18,7 +18,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const body = await req.json()
+    let body: Record<string, unknown>
+    try {
+      body = await req.json()
+    } catch {
+      return NextResponse.json({ success: false, error: 'Format JSON tidak valid' }, { status: 400 })
+    }
     const { name, code, address, phone, operationalFundAmount, isActive } = body
 
     const branch = await db.branch.update({

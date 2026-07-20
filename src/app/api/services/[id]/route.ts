@@ -4,7 +4,12 @@ import { db } from '@/lib/db'
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const body = await req.json()
+    let body: Record<string, unknown>
+    try {
+      body = await req.json()
+    } catch {
+      return NextResponse.json({ success: false, error: 'Format JSON tidak valid' }, { status: 400 })
+    }
     const { category, name, variant, price, unit, duration, sortOrder, isActive } = body
 
     const service = await db.service.update({
