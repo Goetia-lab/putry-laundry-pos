@@ -30,7 +30,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Kategori, nama, dan satuan wajib diisi' }, { status: 400 })
     }
 
-    const maxOrder = await db.service.max('sortOrder')
+    const lastService = await db.service.findFirst({ orderBy: { sortOrder: 'desc' } })
+    const maxOrder = lastService?.sortOrder ?? 0
     const service = await db.service.create({
       data: {
         category,
