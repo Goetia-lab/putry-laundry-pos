@@ -43,7 +43,7 @@ export function TutupBukuView() {
   const [expenseDialogBranch, setExpenseDialogBranch] = useState<string | null>(null)
 
   const isToday = selectedDate === getLocalDateString()
-  const pastClosing = isToday ? isPastClosingTime(now) : true
+  const pastClosing = isToday ? isPastClosingTime(now ?? undefined) : true
 
   if (isLoading || !dashboard) {
     return (
