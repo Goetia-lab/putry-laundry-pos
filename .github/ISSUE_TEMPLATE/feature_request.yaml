@@ -1,0 +1,38 @@
+name: 💡 Saran Fitur
+description: Ide untuk meningkatkan aplikasi
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ide keren! Ceritain detailnya biar kami bisa implementasiin.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Masalah yang Ingin Diselesaikan
+      description: Apa yang kurang / bikin ribet?
+      placeholder: "Sekarang harus buka Google Sheets dulu buat liat total piutang..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solusi Usulan
+      description: Gimana menurut lo seharusnya?
+      placeholder: "Tambah halaman Piutang yang nampilin semua pelanggan yang belum bayar"
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatif Lain
+      description: Ada cara lain yang bisa dipake?
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Konteks Tambahan
+      description: Screenshot, mockup, atau referensi aplikasi lain?

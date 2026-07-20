@@ -1,0 +1,80 @@
+name: 🐛 Laporan Bug
+description: Laporkan error atau masalah di aplikasi
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Terima kasih sudah melapor! Makin detail laporannya, makin cepat kami perbaiki.
+
+  - type: input
+    id: url
+    attributes:
+      label: URL / Halaman
+      description: Di halaman mana masalah terjadi?
+      placeholder: "https://putry-laundry-pos.vercel.app/kasir"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Yang Terjadi
+      description: Jelaskan masalahnya — apa yang lo lihat?
+      placeholder: "Tombol hapus pengeluaran muncul error 500..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Yang Diharapkan
+      description: Apa yang seharusnya terjadi?
+      placeholder: "Pengeluaran langsung terhapus, muncul toast sukses"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Langkah Reproduksi
+      description: Langkah detail biar kami bisa reproduce.
+      placeholder: |
+        1. Buka halaman Tutup Buku
+        2. Pilih cabang A
+        3. Klik ikon hapus (trash) pada pengeluaran tertentu
+        4. Lihat error
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log / Screenshot
+      description: Bisa dari console browser (F12 → Console), Vercel logs, atau screenshot.
+      placeholder: "Paste error message atau upload screenshot..."
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: Perangkat
+      description: Di perangkat apa?
+      options:
+        - Desktop
+        - Mobile (HP)
+        - Tablet
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - Lainnya
+    validations:
+      required: false

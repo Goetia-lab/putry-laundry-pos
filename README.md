@@ -260,11 +260,13 @@ NEXTAUTH_URL="http://localhost:3000"
 
 ## 🤝 Kontribusi
 
-1. Fork repo
-2. Buat branch: `git checkout -b feature/nama-fitur`
-3. Commit: `git commit -m 'Add feature'`
-4. Push: `git push origin feature/nama-fitur`
-5. Buat Pull Request
+Kami terbuka untuk kontribusi dari siapa pun! Lihat **[CONTRIBUTING.md](./CONTRIBUTING.md)** untuk panduan lengkap:
+
+- Setup lokal (clone sampai seed data) ⚡
+- Coding conventions & commit message format 📝
+- Pull Request process 🔄
+
+**Cari task ringan?** Cek [Issues dengan label `good first issue`](https://github.com/Goetia-lab/putry-laundry-pos/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 
 ---
 
