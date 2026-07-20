@@ -1,0 +1,26 @@
+# Render Blueprint untuk Putry Laundry POS
+# File ini digunakan oleh Render untuk auto-deploy
+# Bisa juga setup manual via dashboard Render
+
+services:
+  - type: web
+    name: putry-laundry-pos
+    runtime: node
+    plan: free # atau 'starter' untuk production
+    region: singapore # pilih region terdekat dengan Indonesia
+    branch: main
+    healthCheckPath: /api
+    buildCommand: npm install && npx prisma generate && npm run build:prod
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false # set manual di dashboard Render (Supabase pooler URL)
+      - key: DIRECT_URL
+        sync: false # set manual di dashboard Render (Supabase direct URL)
+      - key: NEXTAUTH_SECRET
+        generateValue: true # Render auto-generate secret
+      - key: NEXTAUTH_URL
+        sync: false # set ke URL Render app setelah deploy
+    autoDeploy: true
