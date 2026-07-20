@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
+function stripHtml(s: string): string {
+  return s.replace(/<[^>]*>/g, '')
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -59,8 +63,16 @@ export async function POST(req: NextRequest) {
     }
     const { name, phone, address, branchId } = body
 
-    if (!name) {
+    if (!name || !name.trim()) {
       return NextResponse.json({ success: false, error: 'Nama customer wajib diisi' }, { status: 400 })
+    }
+
+    // Validate branchId exists
+    if (branchId) {
+      const branch = await db.branch.findUnique({ where: { id: branchId } })
+      if (!branch) {
+        return NextResponse.json({ success: false, error: 'Cabang tidak ditemukan' }, { status: 404 })
+      }
     }
 
     // Deduplication: if phone is provided, check for existing customer with same phone
@@ -76,9 +88,9 @@ export async function POST(req: NextRequest) {
 
     const customer = await db.customer.create({
       data: {
-        name,
+        name: stripHtml(name),
         phone: phone || null,
-        address: address || null,
+        address: address ? stripHtml(address) : null,
         branchId: branchId || null,
       },
     })
