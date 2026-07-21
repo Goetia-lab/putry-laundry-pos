@@ -17,12 +17,12 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Switch } from '@/components/ui/switch'
 import { PageHeader, EmptyState } from '@/components/shared/ui-bits'
-import { formatRupiah, SERVICE_CATEGORIES, getLoyaltyTier, formatEstimatedDate } from '@/lib/format'
+import { formatRupiah, SERVICE_CATEGORIES, formatEstimatedDate } from '@/lib/format'
 import { toast } from 'sonner'
 import {
   Search, Plus, Minus, Trash2, ShoppingCart, X, CheckCircle2,
   Package, ShoppingCart as CartIcon, Printer, Banknote, Clock,
-  UserCheck, UserPlus, ChevronsUpDown, Check, Tag, Crown, CalendarClock, Zap,
+  UserCheck, UserPlus, ChevronsUpDown, Check, CalendarClock, Zap,
 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 
@@ -75,12 +75,7 @@ export function KasirView() {
   }, [filteredServices])
 
   const totalAmount = total()
-  // Loyalty discount calculation
-  const selectedCustomer = customers?.find((c) => c.id === selectedCustomerId)
-  const loyaltyTier = selectedCustomer ? getLoyaltyTier(selectedCustomer.totalSpent ?? 0) : null
-  const discountPercent = loyaltyTier?.discountPercent ?? 0
-  const discountAmount = Math.round((totalAmount * discountPercent) / 100)
-  const finalTotal = totalAmount - discountAmount
+  const finalTotal = totalAmount
   const paid = paymentStatus === 'LUNAS' ? (Number(paidAmount) || finalTotal) : 0
   const change = Math.max(0, paid - finalTotal)
 
@@ -126,7 +121,7 @@ export function KasirView() {
         customerPhone: customerPhone.trim() || null,
         paymentStatus,
         paidAmount: paymentStatus === 'LUNAS' ? paid : 0,
-        discountPercent,
+        discountPercent: 0,
         notes: notes.trim() || null,
         items: items.map((i) => ({
           serviceId: i.serviceId,
@@ -371,25 +366,10 @@ export function KasirView() {
                     <span className="text-sm text-muted-foreground">Subtotal</span>
                     <span className="text-sm font-medium tabular-nums">{formatRupiah(totalAmount)}</span>
                   </div>
-                  {discountPercent > 0 && (
-                    <div className="flex items-center justify-between rounded-md bg-emerald-50 dark:bg-emerald-950/30 px-2 py-1.5 text-sm">
-                      <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400">
-                        <Tag className="h-3.5 w-3.5" />
-                        Diskon {loyaltyTier?.icon} {discountPercent}%
-                      </span>
-                      <span className="font-semibold tabular-nums text-emerald-600">- {formatRupiah(discountAmount)}</span>
-                    </div>
-                  )}
                   <div className="flex items-center justify-between rounded-lg bg-primary/5 px-3 py-2">
                     <span className="text-sm font-semibold">Total</span>
                     <span className="text-xl font-bold tabular-nums text-primary">{formatRupiah(finalTotal)}</span>
                   </div>
-                  {discountPercent > 0 && (
-                    <div className="flex items-center gap-2 rounded-md bg-violet-50 dark:bg-violet-950/30 px-2 py-1.5 text-[11px] text-violet-700 dark:text-violet-300">
-                      <Crown className="h-3.5 w-3.5 shrink-0" />
-                      <span>Pelanggan {loyaltyTier?.name} menikmati diskon {discountPercent}% — hemat {formatRupiah(discountAmount)}!</span>
-                    </div>
-                  )}
                   <Button className="w-full gap-2" size="lg" onClick={() => setCheckoutOpen(true)} disabled={!selectedBranch || items.length === 0}>
                     <Banknote className="h-4 w-4" />
                     Checkout
@@ -585,15 +565,6 @@ export function KasirView() {
                 <span className="text-muted-foreground">Subtotal</span>
                 <span className="font-semibold tabular-nums">{formatRupiah(totalAmount)}</span>
               </div>
-              {discountPercent > 0 && (
-                <div className="flex items-center justify-between rounded-md bg-emerald-50 dark:bg-emerald-950/30 px-2 py-1.5">
-                  <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400">
-                    <Tag className="h-3.5 w-3.5" />
-                    Diskon Loyalty {loyaltyTier?.icon} {loyaltyTier?.name} ({discountPercent}%)
-                  </span>
-                  <span className="font-semibold tabular-nums text-emerald-600">- {formatRupiah(discountAmount)}</span>
-                </div>
-              )}
               <div className="flex justify-between border-t pt-2">
                 <span className="font-medium">Total Bayar</span>
                 <span className="text-lg font-bold tabular-nums text-primary">{formatRupiah(finalTotal)}</span>

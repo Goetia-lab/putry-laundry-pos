@@ -155,15 +155,6 @@ export function LaporanView() {
                     <p className="mt-1 text-lg font-bold tabular-nums">{formatRupiah(report.totalSubtotal ?? report.totalRevenue)}</p>
                   </div>
                 </div>
-                {/* Discount rate insight */}
-                <div className="mt-3 flex items-center gap-2 rounded-lg bg-emerald-100/50 dark:bg-emerald-950/30 px-3 py-2 text-xs">
-                  <Crown className="h-4 w-4 shrink-0 text-emerald-600" />
-                  <span className="text-emerald-800 dark:text-emerald-300">
-                    {report.transactionCount > 0
-                      ? `${Math.round(((report.discountedTransactionCount ?? 0) / report.transactionCount) * 100)}% transaksi mendapat diskon loyalty · ${(report.avgDiscountPercent ?? 0).toFixed(1)}% rata-rata diskon per transaksi`
-                      : 'Belum ada transaksi dengan diskon'}
-                  </span>
-                </div>
               </CardContent>
             </Card>
           )}

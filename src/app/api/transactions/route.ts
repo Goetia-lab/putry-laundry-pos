@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
       return sum + (item.price * item.quantity)
     }, 0)
 
-    // H1: ✅ Loyalty discount clamp — max 15% (tier-based)
+    // Discount clamp — max 15%
     const discountPct = Math.min(Number(discountPercent) || 0, 15)
     const discountAmount = Math.round((subtotal * discountPct) / 100)
     const totalAmount = subtotal - discountAmount

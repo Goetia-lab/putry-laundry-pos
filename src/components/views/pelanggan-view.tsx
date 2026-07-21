@@ -10,11 +10,11 @@ import { Label } from '@/components/ui/label'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { PageHeader, EmptyState, StatCard } from '@/components/shared/ui-bits'
-import { formatRupiah, formatDate, getLoyaltyTier, getProgressToNextTier, LOYALTY_TIERS } from '@/lib/format'
+import { formatRupiah, formatDate } from '@/lib/format'
 import { toast } from 'sonner'
 import {
   Users, Plus, Search, Pencil, Trash2, Phone, MapPin, User,
-  ShoppingBag, TrendingUp, Mail, Crown, Award, Star, Gem,
+  ShoppingBag, TrendingUp, Mail,
 } from 'lucide-react'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
@@ -94,29 +94,6 @@ export function PelangganView() {
         </CardContent>
       </Card>
 
-      {/* Loyalty tiers legend */}
-      <Card className="mb-6 border-primary/20 bg-gradient-to-br from-primary/5 to-emerald-50/50 dark:to-emerald-950/10">
-        <CardContent className="p-4">
-          <div className="mb-3 flex items-center gap-2">
-            <Crown className="h-4 w-4 text-primary" />
-            <p className="text-sm font-semibold">Program Loyalitas Pelanggan</p>
-          </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {LOYALTY_TIERS.map((t) => {
-              const count = customers?.filter((c) => getLoyaltyTier(c.totalSpent ?? 0).name === t.name).length ?? 0
-              return (
-                <div key={t.name} className={`rounded-lg border ${t.borderColor} ${t.bgColor} p-3 text-center`}>
-                  <div className="text-2xl">{t.icon}</div>
-                  <p className={`mt-1 text-sm font-bold ${t.color}`}>{t.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{formatRupiah(t.minSpent)}+</p>
-                  <p className="mt-1 text-xs font-semibold tabular-nums">{count} pelanggan</p>
-                </div>
-              )
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Customer grid */}
       {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[...Array(6)].map((_, i) => <Card key={i}><CardContent className="h-40 animate-pulse bg-muted/40" /></Card>)}</div>
@@ -130,10 +107,8 @@ export function PelangganView() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {customers.map((c, idx) => {
-            const tier = getLoyaltyTier(c.totalSpent ?? 0)
-            const { next, progress } = getProgressToNextTier(c.totalSpent ?? 0)
             return (
-              <Card key={c.id} className={`card-hover group animate-scale-in overflow-hidden border-l-4 ${tier.borderColor}`} style={{ animationDelay: `${idx * 30}ms` }}>
+              <Card key={c.id} className="card-hover group animate-scale-in overflow-hidden border-l-4 border-primary/20" style={{ animationDelay: `${idx * 30}ms` }}>
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
@@ -143,9 +118,6 @@ export function PelangganView() {
                             {getInitials(c.name)}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-card text-sm shadow-sm" title={`${tier.name} - ${tier.description}`}>
-                          {tier.icon}
-                        </span>
                       </div>
                       <div className="min-w-0">
                         <p className="truncate font-semibold">{c.name}</p>
@@ -153,10 +125,6 @@ export function PelangganView() {
                           {c.branch && (
                             <Badge variant="outline" className="h-5 text-[10px]">{c.branch.code}</Badge>
                           )}
-                          <Badge className={`h-5 gap-1 text-[10px] ${tier.bgColor} ${tier.color} hover:opacity-80`} title={tier.description}>
-                            <Crown className="h-2.5 w-2.5" />
-                            {tier.name}
-                          </Badge>
                         </div>
                       </div>
                     </div>
@@ -201,30 +169,6 @@ export function PelangganView() {
                       <p className="text-sm font-bold tabular-nums text-primary">{formatRupiah(c.totalSpent ?? 0)}</p>
                     </div>
                   </div>
-
-                  {/* Loyalty progress bar */}
-                  {next ? (
-                    <div className="mt-3 border-t pt-3">
-                      <div className="mb-1 flex items-center justify-between text-[10px]">
-                        <span className="text-muted-foreground">{tier.icon} {tier.name}</span>
-                        <span className="font-medium text-muted-foreground">{next.icon} {next.name}</span>
-                      </div>
-                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-primary to-emerald-500 transition-all duration-500"
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                      <p className="mt-1 text-[10px] text-muted-foreground">
-                        {progress}% menuju {next.name} · {formatRupiah(next.minSpent - (c.totalSpent ?? 0))} lagi
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="mt-3 flex items-center gap-1.5 rounded-md bg-violet-100 px-2 py-1.5 text-[11px] font-medium text-violet-700 dark:bg-violet-950/40 dark:text-violet-300 border-t">
-                      <Gem className="h-3.5 w-3.5" />
-                      Tier tertinggi tercapai! 🎉
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             )
