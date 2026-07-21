@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { authorizeBranchAccess } from '@/lib/auth'
 
 // C1+C2+C4: ✅ Basic API key auth for all /api/ routes — fail-closed
 const API_KEY = process.env.API_KEY || ''
@@ -65,8 +66,14 @@ export function middleware(request: NextRequest) {
   if (token !== AUTH_SECRET) {
     return NextResponse.json({ success: false, error: 'Unauthorized — API key atau token tidak valid' }, { status: 401 })
   }
-  // ponytail: C4 — For proper multi-user auth (Google OAuth), integrate next-auth or clerk.
-  // ponytail: C2 — Branch scope check should verify token claims against branchId query param.
+
+  // C2: ✅ Branch scope — embed allowed branch list in request header
+  // ponytail: BRANCH_KEYS env var as JSON map. Falls back to all-access.
+  const branchId = request.nextUrl.searchParams.get('branchId')
+  const auth = authorizeBranchAccess(authHeader, apiKeyHeader, branchId)
+  if (!auth.allowed) {
+    return NextResponse.json({ success: false, error: auth.error || 'Akses cabang ditolak' }, { status: 403 })
+  }
 
   return NextResponse.next()
 }
