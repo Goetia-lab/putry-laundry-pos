@@ -31,7 +31,6 @@ export async function GET(req: NextRequest) {
     })
 
     // Aggregate total spent per customer in ONE grouped query instead of N+1
-    // (sebelumnya: 1 aggregate per customer → up to 100 round-trip ke DB).
     const customerIds = customers.map((c) => c.id)
     const stats =
       customerIds.length > 0
@@ -82,20 +81,25 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Deduplication: if phone is provided, check for existing customer with same phone
-    if (phone && phone.trim()) {
-      const existing = await db.customer.findFirst({
-        where: { phone: phone.trim() },
-      })
-      if (existing) {
-        // Return existing customer instead of creating duplicate
-        return NextResponse.json({ success: true, data: existing, deduplicated: true })
-      }
+    // Dedup: by phone OR by case-insensitive name
+    const trimmedName = name.trim()
+    const trimmedPhone = (phone || '').trim()
+    const orClauses = []
+    if (trimmedPhone) orClauses.push({ phone: trimmedPhone })
+    if (!trimmedPhone) orClauses.push({ name: { equals: trimmedName, mode: 'insensitive' as const } })
+
+    const existing = await db.customer.findFirst({
+      where: { OR: orClauses.length > 0 ? orClauses : undefined },
+    })
+
+    if (existing) {
+      // Return existing customer instead of creating duplicate
+      return NextResponse.json({ success: true, data: existing, deduplicated: true })
     }
 
     const customer = await db.customer.create({
       data: {
-        name: stripHtml(name),
+        name: stripHtml(trimmedName),
         phone: phone || null,
         address: address ? stripHtml(address) : null,
         branchId: branchId || null,
