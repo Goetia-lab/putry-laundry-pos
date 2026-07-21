@@ -81,19 +81,25 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Dedup: by phone OR by case-insensitive name
+    // Dedup: by phone OR by case-insensitive name (LOWER)
     const trimmedName = name.trim()
     const trimmedPhone = (phone || '').trim()
-    const orClauses = []
-    if (trimmedPhone) orClauses.push({ phone: trimmedPhone })
-    if (!trimmedPhone) orClauses.push({ name: { equals: trimmedName, mode: 'insensitive' as const } })
 
-    const existing = await db.customer.findFirst({
-      where: { OR: orClauses.length > 0 ? orClauses : undefined },
-    })
+    let existing = null
+    if (trimmedPhone) {
+      existing = await db.customer.findFirst({ where: { phone: trimmedPhone } })
+    }
+    if (!existing && trimmedName) {
+      const rows = await db.$queryRawUnsafe<{ id: string }[]>(
+        'SELECT id FROM "Customer" WHERE LOWER(name) = LOWER($1) LIMIT 1',
+        trimmedName,
+      )
+      if (rows.length > 0) {
+        existing = await db.customer.findUnique({ where: { id: rows[0].id } })
+      }
+    }
 
     if (existing) {
-      // Return existing customer instead of creating duplicate
       return NextResponse.json({ success: true, data: existing, deduplicated: true })
     }
 
