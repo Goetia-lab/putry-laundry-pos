@@ -61,9 +61,10 @@ model Transaction {
   invoiceNo    String   @unique
   branchId     String
   customerId   String?
-  customerName String
-  customerPhone String?
-  date         DateTime @default(now())
+  customerName      String
+  customerPhone     String?
+  customerOrderIndex Int?
+  date              DateTime @default(now())
   pickupDate   DateTime?
   status       String   @default("PROSES")
   paymentStatus String  @default("LUNAS")

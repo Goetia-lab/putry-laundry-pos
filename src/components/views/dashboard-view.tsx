@@ -340,6 +340,58 @@ export function DashboardView() {
 
       {/* Pending & Ready for Pickup alerts */}
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        {/* Overdue pickup warning — items SELESAI > 3 hari */}
+        {(() => {
+          const overdue = (data.readyForPickup || []).filter(t => {
+            const est = formatEstimatedDate(t.date, t.items)
+            return est.isOverdue && Math.abs(est.daysLeft) >= 3
+          })
+          if (overdue.length === 0) return null
+          const total = overdue.reduce((s, t) => s + t.totalAmount, 0)
+          return (
+            <Card className="border-rose-200 bg-rose-50/50 dark:border-rose-900 dark:bg-rose-950/20 lg:col-span-2">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5 text-rose-600" />
+                  <CardTitle className="text-base flex items-center gap-2">
+                    ⚠️ {overdue.length} Nota Belum Diambil &gt; 3 Hari
+                    <Badge variant="destructive" className="h-5 text-[10px]">Segera Hubungi Customer</Badge>
+                  </CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-1.5">
+                  {overdue.slice(0, 10).map(t => (
+                    <div key={t.id} className="flex items-center justify-between gap-2 rounded-lg border border-rose-200/50 bg-card p-2 text-sm">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-rose-100 text-[10px] font-bold text-rose-700 dark:bg-rose-900 dark:text-rose-300">
+                          {t.branch?.code}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate font-medium">{t.customerName}</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {t.invoiceNo} · {formatEstimatedDate(t.date, t.items).label}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {t.customerPhone && (
+                          <>
+                            <a href={`tel:${t.customerPhone}`} className="flex h-6 w-6 items-center justify-center rounded bg-rose-500 text-white" title="Telepon"><Phone className="h-3 w-3" /></a>
+                            <a href={buildWhatsAppUrl(t.customerPhone, `Halo ${t.customerName}, laundry Anda dengan invoice ${t.invoiceNo} sudah selesai dan menunggu diambil. Mohon segera diambil. Terima kasih!`)} target="_blank" rel="noopener noreferrer" className="flex h-6 w-6 items-center justify-center rounded bg-emerald-500 text-white" title="WhatsApp"><MessageCircle className="h-3 w-3" /></a>
+                          </>
+                        )}
+                        <p className="ml-1 font-semibold tabular-nums text-xs">{formatRupiah(t.totalAmount)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">Total: <span className="font-semibold">{formatRupiah(total)}</span> — <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={() => setView('transaksi')}>Lihat semua di Transaksi</Button></p>
+              </CardContent>
+            </Card>
+          )
+        })()}
+
         {/* Ready for pickup */}
         <Card className="border-sky-200 bg-sky-50/50 dark:border-sky-900 dark:bg-sky-950/20">
           <CardHeader className="pb-3">

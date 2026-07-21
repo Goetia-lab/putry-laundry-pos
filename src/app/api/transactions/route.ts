@@ -8,11 +8,13 @@ export async function GET(req: NextRequest) {
     const branchId = searchParams.get('branchId')
     const date = searchParams.get('date') // YYYY-MM-DD
     const status = searchParams.get('status')
+    const paymentStatus = searchParams.get('paymentStatus')
     const limit = Number(searchParams.get('limit')) || 100
 
     const where: Record<string, unknown> = {}
     if (branchId) where.branchId = branchId
     if (status) where.status = status
+    if (paymentStatus) where.paymentStatus = paymentStatus
     if (date) {
       const start = new Date(`${date}T00:00:00.000Z`)
       const end = new Date(`${date}T23:59:59.999Z`)
@@ -87,6 +89,11 @@ export async function POST(req: NextRequest) {
     })
     const invoiceNo = `INV-${branch.code}-${datePart}-${String(countToday + 1).padStart(3, '0')}`
 
+    // Customer order index — track this customer's Nth visit
+    const customerOrderIndex = customerId
+      ? (await db.transaction.count({ where: { customerId } })) + 1
+      : null
+
     const transaction = await db.transaction.create({
       data: {
         invoiceNo,
@@ -94,6 +101,7 @@ export async function POST(req: NextRequest) {
         customerId: customerId || null,
         customerName,
         customerPhone: customerPhone || null,
+        customerOrderIndex,
         pickupDate: pickupDate ? new Date(pickupDate) : null,
         status: 'PROSES',
         paymentStatus: paymentStatus || 'LUNAS',

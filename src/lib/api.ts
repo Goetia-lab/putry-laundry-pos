@@ -55,6 +55,7 @@ export interface Transaction {
   branchId: string
   customerName: string
   customerPhone?: string | null
+  customerOrderIndex?: number | null
   date: string
   pickupDate?: string | null
   status: string
@@ -192,11 +193,12 @@ export function useServices(category?: string) {
   })
 }
 
-export function useTransactions(params?: { branchId?: string; date?: string; status?: string; limit?: number }) {
+export function useTransactions(params?: { branchId?: string; date?: string; status?: string; paymentStatus?: string; limit?: number }) {
   const qs = new URLSearchParams()
   if (params?.branchId) qs.set('branchId', params.branchId)
   if (params?.date) qs.set('date', params.date)
   if (params?.status) qs.set('status', params.status)
+  if (params?.paymentStatus) qs.set('paymentStatus', params.paymentStatus)
   if (params?.limit) qs.set('limit', String(params.limit))
   const query = qs.toString()
   return useQuery<Transaction[]>({

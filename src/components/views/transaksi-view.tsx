@@ -38,6 +38,7 @@ const STATUS_LABELS: Record<string, string> = {
 export function TransaksiView() {
   const [branchId, setBranchId] = useState<string>('all')
   const [status, setStatus] = useState<string>('all')
+  const [paymentFilter, setPaymentFilter] = useState<string>('all')
   const [search, setSearch] = useState('')
   const [detailTx, setDetailTx] = useState<Transaction | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -46,6 +47,7 @@ export function TransaksiView() {
   const { data: transactions, isLoading } = useTransactions({
     branchId: branchId !== 'all' ? branchId : undefined,
     status: status !== 'all' ? status : undefined,
+    paymentStatus: paymentFilter !== 'all' ? paymentFilter : undefined,
     limit: 200,
   })
 
@@ -90,6 +92,14 @@ export function TransaksiView() {
               <SelectItem value="PROSES">Proses</SelectItem>
               <SelectItem value="SELESAI">Selesai</SelectItem>
               <SelectItem value="DIAMBIL">Diambil</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={paymentFilter} onValueChange={setPaymentFilter}>
+            <SelectTrigger className="w-full sm:w-[160px]"><SelectValue placeholder="Pembayaran" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Pembayaran</SelectItem>
+              <SelectItem value="LUNAS">Lunas</SelectItem>
+              <SelectItem value="BELUM_BAYAR">Belum Bayar</SelectItem>
             </SelectContent>
           </Select>
         </CardContent>
@@ -315,6 +325,9 @@ function TransactionDetail({ tx, onClose }: { tx: Transaction | null; onClose: (
           <div>
             <p className="text-xs text-muted-foreground">Customer</p>
             <p className="font-medium">{tx.customerName}</p>
+            {tx.customerOrderIndex && (
+              <p className="text-[10px] text-muted-foreground mt-0.5">Order ke-{tx.customerOrderIndex}</p>
+            )}
           </div>
           <div>
             <p className="text-xs text-muted-foreground">No. HP</p>
