@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authorizeBranchAccess } from '@/lib/auth'
+import { authorizeBranchAccess, getAllowedBranchIds } from '@/lib/auth'
 
 // C1+C2+C4: ✅ Basic API key auth for all /api/ routes — fail-closed
 const API_KEY = process.env.API_KEY || ''
@@ -63,7 +63,12 @@ export function middleware(request: NextRequest) {
   const apiKeyHeader = request.headers.get('x-api-key') || ''
   const token = apiKeyHeader || authHeader.replace(/^Bearer\s+/i, '')
 
-  if (token !== AUTH_SECRET) {
+  // Accept: AUTH_SECRET (API_KEY/GAUTH_B64) OR any key listed in BRANCH_KEYS
+  // ponytail: single key for all branches. BRANCH_KEYS keys for scoped access.
+  const branchKeysEntry = getAllowedBranchIds(token)
+  const isBranchKey = branchKeysEntry !== null // key is in BRANCH_KEYS list
+
+  if (token !== AUTH_SECRET && !isBranchKey) {
     return NextResponse.json({ success: false, error: 'Unauthorized — API key atau token tidak valid' }, { status: 401 })
   }
 
