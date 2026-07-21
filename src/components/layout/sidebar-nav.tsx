@@ -41,19 +41,19 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const qc = useQueryClient()
 
   const prefetch = (key: ViewKey) => {
-    const map: Record<string, [string, string?]> = {
-      dashboard: ['dashboard'],
-      kasir: ['services'],
-      transaksi: ['transactions'],
-      pricelist: ['services'],
-      pelanggan: ['customers'],
+    const map: Record<string, [string, ...unknown[]]> = {
+      dashboard: ['dashboard', undefined],
+      kasir: ['services', undefined],
+      transaksi: ['transactions', undefined],
+      pricelist: ['services', undefined],
+      pelanggan: ['customers', undefined, undefined],
       cabang: ['branches'],
-      tutupbuku: ['daily-closings'],
+      tutupbuku: ['daily-closings', undefined, undefined],
       rekap: ['main-recaps'],
-      laporan: ['report'],
+      laporan: ['report', '', '', undefined],
     }
-    const [qk] = map[key]
-    if (qk) qc.prefetchQuery({ queryKey: [qk] })
+    const qk = map[key]
+    if (qk) qc.prefetchQuery({ queryKey: qk })
   }
 
   return (

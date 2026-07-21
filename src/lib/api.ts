@@ -175,9 +175,8 @@ export function useBranches() {
   return useQuery<Branch[]>({
     queryKey: ['branches'],
     queryFn: () => fetcher<{ success: boolean; data: Branch[] }>('/api/branches').then((r) => r.data),
-    placeholderData: keepPreviousData,
-    // Data cabang jarang berubah → cache lebih agresif supaya pindah halaman gak refetch.
-    staleTime: 30 * 60 * 1000,
+    staleTime: 30 * 60 * 1000,   // cabang jarang berubah
+    gcTime: 60 * 60 * 1000,
   })
 }
 
@@ -188,9 +187,8 @@ export function useServices(category?: string) {
       fetcher<{ success: boolean; data: Service[] }>(
         `/api/services${category ? `?category=${category}` : ''}`
       ).then((r) => r.data),
-    placeholderData: keepPreviousData,
-    // Daftar layanan jarang berubah → cache lebih agresif supaya pindah halaman gak refetch.
     staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
   })
 }
 
@@ -206,6 +204,7 @@ export function useTransactions(params?: { branchId?: string; date?: string; sta
     queryKey: ['transactions', params],
     queryFn: () => fetcher<{ success: boolean; data: Transaction[] }>(`/api/transactions${query ? `?${query}` : ''}`).then((r) => r.data),
     placeholderData: keepPreviousData,
+    staleTime: 30_000, // 30 detik — transaksi berubah lebih sering
   })
 }
 
@@ -218,6 +217,7 @@ export function useExpenses(branchId?: string, date?: string) {
     queryKey: ['expenses', branchId, date],
     queryFn: () => fetcher<{ success: boolean; data: OperationalExpense[] }>(`/api/expenses${query ? `?${query}` : ''}`).then((r) => r.data),
     placeholderData: keepPreviousData,
+    staleTime: 30_000,
   })
 }
 
@@ -230,6 +230,7 @@ export function useDailyClosings(branchId?: string, date?: string) {
     queryKey: ['daily-closings', branchId, date],
     queryFn: () => fetcher<{ success: boolean; data: DailyClosing[] }>(`/api/daily-closing${query ? `?${query}` : ''}`).then((r) => r.data),
     placeholderData: keepPreviousData,
+    staleTime: 5 * 60 * 1000,
   })
 }
 
@@ -238,6 +239,7 @@ export function useMainRecaps() {
     queryKey: ['main-recaps'],
     queryFn: () => fetcher<{ success: boolean; data: MainRecap[] }>('/api/recap').then((r) => r.data),
     placeholderData: keepPreviousData,
+    staleTime: 5 * 60 * 1000,
   })
 }
 
@@ -246,6 +248,7 @@ export function useDashboard(date?: string) {
     queryKey: ['dashboard', date],
     queryFn: () => fetcher<{ success: boolean; data: DashboardData }>(`/api/dashboard${date ? `?date=${date}` : ''}`).then((r) => r.data),
     placeholderData: keepPreviousData,
+    staleTime: 30_000,
   })
 }
 
@@ -502,6 +505,7 @@ export function useCustomers(search?: string, branchId?: string) {
     queryKey: ['customers', search, branchId],
     queryFn: () => fetcher<{ success: boolean; data: Customer[] }>(`/api/customers${query ? `?${query}` : ''}`).then((r) => r.data),
     placeholderData: keepPreviousData,
+    staleTime: 30_000,
   })
 }
 
