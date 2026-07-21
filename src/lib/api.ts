@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 
 // Generic fetcher — auto-attach API key for auth
 // ponytail: client-side API_KEY via NEXT_PUBLIC env. Upgrade to real session auth when >5 users.
+// IMPORTANT: NEXT_PUBLIC_API_KEY must be set in Vercel env for browser requests to work
 const API_KEY = process.env.NEXT_PUBLIC_API_KEY || ''
 async function fetcher<T>(url: string): Promise<T> {
   const res = await fetch(url, {
