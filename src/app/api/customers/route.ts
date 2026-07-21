@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { parsePagination, buildPaginationMeta } from '@/lib/pagination'
 
 function stripHtml(s: string): string {
   return s.replace(/<[^>]*>/g, '')
@@ -10,6 +11,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const branchId = searchParams.get('branchId')
     const search = searchParams.get('search')
+    const { cursor, take } = parsePagination(searchParams)
 
     const where: Record<string, unknown> = {}
     if (branchId) where.branchId = branchId
@@ -22,13 +24,19 @@ export async function GET(req: NextRequest) {
 
     const customers = await db.customer.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      take: cursor ? take + 1 : take,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       include: {
         _count: { select: { transactions: true } },
         branch: true,
       },
-      take: 100,
     })
+
+    const hasMore = customers.length > take
+    if (hasMore) customers.pop()
+
+    const pagination = buildPaginationMeta(customers, { cursor, take })
 
     // Aggregate total spent per customer in ONE grouped query instead of N+1
     const customerIds = customers.map((c) => c.id)
@@ -52,7 +60,7 @@ export async function GET(req: NextRequest) {
       }
     })
 
-    return NextResponse.json({ success: true, data: customersWithStats })
+    return NextResponse.json({ success: true, data: customersWithStats, pagination })
   } catch (error) {
     console.error('GET /api/customers error:', error)
     return NextResponse.json({ success: false, error: 'Gagal memuat customer' }, { status: 500 })

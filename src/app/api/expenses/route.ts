@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { parsePagination, buildPaginationMeta } from '@/lib/pagination'
 
 function stripHtml(s: string): string {
   return s.replace(/<[^>]*>/g, '')
@@ -10,6 +11,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const branchId = searchParams.get('branchId')
     const date = searchParams.get('date') // YYYY-MM-DD
+    const { cursor, take } = parsePagination(searchParams)
 
     const where: Record<string, unknown> = {}
     if (branchId) where.branchId = branchId
@@ -21,10 +23,17 @@ export async function GET(req: NextRequest) {
 
     const expenses = await db.operationalExpense.findMany({
       where,
-      orderBy: { date: 'desc' },
+      orderBy: [{ date: 'desc' }, { id: 'desc' }],
+      take: cursor ? take + 1 : take,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       include: { branch: true },
     })
-    return NextResponse.json({ success: true, data: expenses })
+
+    const hasMore = expenses.length > take
+    if (hasMore) expenses.pop()
+
+    const pagination = buildPaginationMeta(expenses, { cursor, take })
+    return NextResponse.json({ success: true, data: expenses, pagination })
   } catch (error) {
     console.error('GET /api/expenses error:', error)
     return NextResponse.json({ success: false, error: 'Gagal memuat pengeluaran' }, { status: 500 })

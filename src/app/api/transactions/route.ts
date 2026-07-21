@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { getLocalDateString } from '@/lib/format'
+import { parsePagination, buildPaginationMeta } from '@/lib/pagination'
 
 export async function GET(req: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function GET(req: NextRequest) {
     const date = searchParams.get('date') // YYYY-MM-DD
     const status = searchParams.get('status')
     const paymentStatus = searchParams.get('paymentStatus')
-    const limit = Number(searchParams.get('limit')) || 100
+    const { cursor, take } = parsePagination(searchParams)
 
     const where: Record<string, unknown> = {}
     if (branchId) where.branchId = branchId
@@ -23,15 +24,22 @@ export async function GET(req: NextRequest) {
 
     const transactions = await db.transaction.findMany({
       where,
-      orderBy: { date: 'desc' },
-      take: limit,
+      orderBy: [{ date: 'desc' }, { id: 'desc' }],
+      take: cursor ? take + 1 : take, // +1 to detect hasMore with cursor
+      skip: 0,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       include: {
         branch: true,
         items: true,
       },
     })
 
-        return NextResponse.json({ success: true, data: transactions })
+    const hasMore = transactions.length > take
+    if (hasMore) transactions.pop() // remove the extra item
+
+    const pagination = buildPaginationMeta(transactions, { cursor, take })
+
+    return NextResponse.json({ success: true, data: transactions, pagination })
   } catch (error) {
     console.error('GET /api/transactions error:', error)
     return NextResponse.json({ success: false, error: 'Gagal memuat transaksi' }, { status: 500 })
