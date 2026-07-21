@@ -3,9 +3,13 @@
 import { keepPreviousData, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 
-// Generic fetcher
+// Generic fetcher — auto-attach API key for auth
+// ponytail: client-side API_KEY via NEXT_PUBLIC env. Upgrade to real session auth when >5 users.
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY || ''
 async function fetcher<T>(url: string): Promise<T> {
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    headers: { 'Authorization': `Bearer ${API_KEY}` }
+  })
   if (!res.ok) {
     const data = await res.json().catch(() => ({ error: 'Request gagal' }))
     throw new Error(data.error || 'Request gagal')
