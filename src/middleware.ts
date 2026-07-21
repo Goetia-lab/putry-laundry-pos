@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// C1+C2+C4: ✅ Basic API key auth for all /api/ routes
+// C1+C2+C4: ✅ Basic API key auth for all /api/ routes — fail-closed
 const API_KEY = process.env.API_KEY || ''
 const GAUTH_B64 = process.env.GAUTH_B64 || ''
 const AUTH_SECRET = API_KEY || GAUTH_B64
+
+// C4: ✅ Fail-closed — if neither API_KEY nor GAUTH_B64 is set, block all requests
+// ponytail: Replace with actual env validation at deploy time (Vercel env checks) when CI supports it
 
 // H6: ✅ Simple in-memory rate-limit — Map<ip, {count, resetAt}>
 const rateLimit = new Map<string, { count: number; resetAt: number }>()
@@ -21,6 +24,11 @@ export function middleware(request: NextRequest) {
   // Skip health check
   if (pathname === '/api/health') {
     return NextResponse.next()
+  }
+
+  // C4: ✅ Fail-closed — reject if no auth secret configured (env missing at deploy time)
+  if (!AUTH_SECRET) {
+    return NextResponse.json({ success: false, error: 'Server configuration error — auth not configured' }, { status: 500 })
   }
 
   // H6: ✅ Rate limit by IP
