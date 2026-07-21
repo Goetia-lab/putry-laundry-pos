@@ -47,49 +47,50 @@ export async function POST(req: NextRequest) {
     const totalOperationalFundDisbursed = closings.reduce((s, c) => s + c.operationalFundRetained, 0)
     const grandTotal = totalNetIncome - totalOperationalFundDisbursed
 
-    const recap = await db.mainRecap.upsert({
-      where: { recapDate },
-      create: {
-        recapDate,
-        totalGrossIncome,
-        totalExpenses,
-        totalNetIncome,
-        totalOperationalFundDisbursed,
-        grandTotal,
-        status: 'CLOSED',
-      },
-      update: {
-        totalGrossIncome,
-        totalExpenses,
-        totalNetIncome,
-        totalOperationalFundDisbursed,
-        grandTotal,
-      },
-      include: { entries: { include: { branch: true } } },
-    })
-
-    // Refresh entries
-    await db.mainRecapEntry.deleteMany({ where: { recapId: recap.id } })
-    if (closings.length > 0) {
-      await db.mainRecapEntry.createMany({
-        data: closings.map((c) => ({
-          recapId: recap.id,
-          branchId: c.branchId,
-          grossIncome: c.grossIncome,
-          expenses: c.operationalExpenses,
-          netIncome: c.netIncome,
-          operationalFundDisbursed: c.operationalFundRetained,
-          netToMain: c.netIncome - c.operationalFundRetained,
-        })),
+    const recap = await db.$transaction(async (tx) => {
+      const r = await tx.mainRecap.upsert({
+        where: { recapDate },
+        create: {
+          recapDate,
+          totalGrossIncome,
+          totalExpenses,
+          totalNetIncome,
+          totalOperationalFundDisbursed,
+          grandTotal,
+          status: 'CLOSED',
+        },
+        update: {
+          totalGrossIncome,
+          totalExpenses,
+          totalNetIncome,
+          totalOperationalFundDisbursed,
+          grandTotal,
+        },
       })
-    }
 
-    const refreshed = await db.mainRecap.findUnique({
-      where: { id: recap.id },
-      include: { entries: { include: { branch: true } } },
+      // Refresh entries atomically
+      await tx.mainRecapEntry.deleteMany({ where: { recapId: r.id } })
+      if (closings.length > 0) {
+        await tx.mainRecapEntry.createMany({
+          data: closings.map((c) => ({
+            recapId: r.id,
+            branchId: c.branchId,
+            grossIncome: c.grossIncome,
+            expenses: c.operationalExpenses,
+            netIncome: c.netIncome,
+            operationalFundDisbursed: c.operationalFundRetained,
+            netToMain: c.netIncome - c.operationalFundRetained,
+          })),
+        })
+      }
+
+      return tx.mainRecap.findUnique({
+        where: { id: r.id },
+        include: { entries: { include: { branch: true } } },
+      })
     })
 
-    return NextResponse.json({ success: true, data: refreshed })
+    return NextResponse.json({ success: true, data: recap })
   } catch (error) {
     console.error('POST /api/recap error:', error)
     return NextResponse.json({ success: false, error: 'Gagal membuat rekap' }, { status: 500 })

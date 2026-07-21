@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: "Sistem Point of Sale untuk bisnis laundry multi-cabang dengan rekap kasir utama dan tutup buku harian.",
   keywords: ["laundry", "POS", "kasir", "laundry POS", "multi cabang", "Putry Laundry"],
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧺</text></svg>",
+    icon: "/favicon.svg",
   },
 };
 

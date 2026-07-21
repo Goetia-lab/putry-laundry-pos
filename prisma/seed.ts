@@ -1,5 +1,12 @@
 import { db } from '../src/lib/db'
 
+// M7: ✅ Production guard — refuse to run in prod
+const env = process.env.NODE_ENV || 'development'
+if (env === 'production') {
+  console.error('❌ Seed: cannot run in production. Set NODE_ENV != production.')
+  process.exit(1)
+}
+
 // Idempotent seed: aman dijalankan berkali-kali.
 // - Branch pakai upsert (field `code` unik).
 // - Service pakai findFirst(category+name+variant) lalu update/create.
@@ -42,7 +49,6 @@ async function main() {
   console.log(`✓ Branches synced: ${branches.map((b) => b.code).join(', ')}`)
 
   // ── Services ───────────────────────────────────────────────────────
-  // Pricelist services from the photo
   const services = [
     // Jasa - Reguler & Express
     { category: 'Jasa', name: 'Cuci Kering', variant: 'Reguler', price: 5000, unit: 'KG', duration: '2-3 Hari', sortOrder: 1 },

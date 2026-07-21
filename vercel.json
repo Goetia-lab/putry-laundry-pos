@@ -1,18 +1,6 @@
 {
-  "services": {
-    "putry-laundry-pos": {
-      "root": ".",
-      "framework": "nextjs",
-      "buildCommand": "prisma generate && next build"
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": {
-        "type": "service",
-        "service": "putry-laundry-pos"
-      }
-    }
-  ]
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "prisma generate && next build",
+  "framework": "nextjs",
+  "regions": ["sin1"]
 }

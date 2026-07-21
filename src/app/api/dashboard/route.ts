@@ -6,8 +6,8 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
     const dateStr = searchParams.get('date') || getLocalDateString()
-    const dayStart = new Date(`${dateStr}T00:00:00.000Z`)
-    const dayEnd = new Date(`${dateStr}T23:59:59.999Z`)
+    const dayStart = new Date(`${dateStr}T00:00:00.000+07:00`)
+    const dayEnd = new Date(`${dateStr}T23:59:59.999+07:00`)
 
     const branches = await db.branch.findMany({ where: { isActive: true }, orderBy: { code: 'asc' } })
     const branchIds = branches.map(b => b.id)
@@ -90,12 +90,12 @@ export async function GET(req: NextRequest) {
     trendStart.setDate(trendStart.getDate() - 6)
     const trendStartStr = trendStart.toISOString().slice(0, 10)
     const trendEndStr = getLocalDateString()
-    const trendDayStart = new Date(`${trendStartStr}T00:00:00.000Z`)
-    const trendDayEnd = new Date(`${trendEndStr}T23:59:59.999Z`)
+    const trendDayStart = new Date(`${trendStartStr}T00:00:00.000+07:00`)
+    const trendDayEnd = new Date(`${trendEndStr}T23:59:59.999+07:00`)
 
     // Run all remaining DB queries in parallel — they don't depend on each other.
     // (Sebelumnya: mainRecap + trend(2) + recent + pending + ready berjalan sequential.)
-    const [allDayTx, allDayExp, recentTransactions, pendingOrders, readyForPickup] = await Promise.all([
+    const [allDayTx, allDayExp, recentTransactions, pendingOrders, readyForPickup, recentExpenses] = await Promise.all([
       db.transaction.findMany({
         where: { date: { gte: trendDayStart, lte: trendDayEnd }, paymentStatus: 'LUNAS' },
         select: { date: true, totalAmount: true },
@@ -122,6 +122,13 @@ export async function GET(req: NextRequest) {
         take: 10,
         include: { branch: true, items: true },
       }),
+      // Recent expenses today for dashboard card
+      db.operationalExpense.findMany({
+        where: { date: { gte: dayStart, lte: dayEnd } },
+        orderBy: { date: 'desc' },
+        take: 5,
+        include: { branch: true },
+      }),
     ])
 
     const trend: Array<{ date: string; gross: number; expenses: number; net: number; count: number }> = []
@@ -147,6 +154,7 @@ export async function GET(req: NextRequest) {
         recentTransactions,
         pendingOrders,
         readyForPickup,
+        recentExpenses,
         totals: {
           grossIncome: totalGross,
           operationalExpenses: totalExpenses,

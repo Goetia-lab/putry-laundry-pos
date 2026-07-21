@@ -9,6 +9,9 @@ function getPoolUrl(): string {
   const raw = process.env.DATABASE_URL || ''
   if (!raw) return raw
   if (!raw.startsWith('postgres')) return raw
+  // M9: ✅ Skip pgbouncer params during db: lifecycle (migrations need direct connection)
+  const lifecycle = process.env.npm_lifecycle_event || ''
+  if (lifecycle.startsWith('db:')) return raw
   if (/\bpgbouncer=true\b/.test(raw)) return raw
   const [base, qs] = raw.split('?')
   const p = new URLSearchParams(qs || '')

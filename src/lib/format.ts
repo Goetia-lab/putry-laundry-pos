@@ -34,18 +34,9 @@ export function dateFromString(dateStr: string): Date {
   return new Date(`${dateStr}T12:00:00.000Z`)
 }
 
-// Get date range for today in Jakarta
-export function getTodayRange(): { start: Date; end: Date } {
-  const now = new Date()
-  const jakartaNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }))
-  const start = new Date(jakartaNow)
-  start.setHours(0, 0, 0, 0)
-  const end = new Date(jakartaNow)
-  end.setHours(23, 59, 59, 999)
-  // Convert back to UTC equivalent by computing offset
-  // Simpler: use date string filtering. Return start/end as local-ish.
-  return { start, end }
-}
+// Get date range for today in Jakarta — unused, kept for reference only
+// ❌ NEVER USE - has timezone bug. Use getLocalDateString() with T00:00:00+07:00 instead.
+// export function getTodayRange(): { start: Date; end: Date } { ... }
 
 export function formatDate(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date

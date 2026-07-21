@@ -131,6 +131,7 @@ export interface DashboardData {
   recentTransactions?: Transaction[]
   pendingOrders?: Transaction[]
   readyForPickup?: Transaction[]
+  recentExpenses?: OperationalExpense[]
   totals: {
     grossIncome: number
     operationalExpenses: number

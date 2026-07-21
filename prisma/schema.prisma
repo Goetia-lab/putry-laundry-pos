@@ -2,12 +2,13 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL") // optional for push, required for migrate
+  directUrl = env("DIRECT_URL")
 }
 
 model Branch {
@@ -81,6 +82,13 @@ model Transaction {
   branch   Branch    @relation(fields: [branchId], references: [id])
   customer Customer? @relation(fields: [customerId], references: [id])
   items    TransactionItem[]
+  // Indexes — H3: ✅ hot columns for dashboard, filtering, sorting
+  @@index([branchId])
+  @@index([date])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([customerId])
+  @@index([branchId, date])
 }
 
 model TransactionItem {
@@ -110,6 +118,10 @@ model OperationalExpense {
   createdAt DateTime @default(now())
 
   branch Branch @relation(fields: [branchId], references: [id])
+  // Indexes — H3: ✅ hot columns for expense reports
+  @@index([branchId])
+  @@index([date])
+  @@index([category])
 }
 
 model DailyClosing {

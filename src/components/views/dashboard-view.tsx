@@ -105,6 +105,62 @@ export function DashboardView() {
         />
       </div>
 
+      {/* Pengeluaran Hari Ini — breakdown */}
+      {data.recentExpenses && data.recentExpenses.length > 0 && (
+        <Card className="mt-4 border-rose-200/60 dark:border-rose-900/40">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-500 text-white">
+                  <Wallet className="h-5 w-5" />
+                </div>
+                <div>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    Pengeluaran Hari Ini
+                    <Badge variant="outline" className="text-rose-600 border-rose-300 bg-rose-50 dark:bg-rose-950/30">
+                      {formatRupiah(data.totals.operationalExpenses)}
+                    </Badge>
+                  </CardTitle>
+                  <CardDescription className="text-xs">{data.recentExpenses.length} pengeluaran tercatat</CardDescription>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" className="gap-1" onClick={() => setView('tutup-buku')}>
+                Kelola <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1.5">
+              {data.recentExpenses.slice(0, 10).map((e: any) => (
+                <div key={e.id} className="flex items-center justify-between gap-2 rounded-lg border border-rose-200/40 bg-card p-2 text-sm">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Badge variant="outline" className="h-5 shrink-0 text-[10px] border-rose-200 text-rose-700 dark:text-rose-400">
+                      {e.category === 'DETERGEN' ? 'Detergen' :
+                       e.category === 'PARFUM' ? 'Parfum' :
+                       e.category === 'PLASTIK' ? 'Plastik' :
+                       e.category === 'LISTRIK' ? 'Listrik' :
+                       e.category === 'AIR' ? 'Air' :
+                       e.category === 'GAJI' ? 'Gaji' :
+                       e.category === 'TRANSPORT' ? 'Transport' : e.category}
+                    </Badge>
+                    <div className="min-w-0">
+                      <p className="truncate text-xs">{e.description}</p>
+                      <p className="text-[10px] text-muted-foreground">{e.branch?.code || ''}</p>
+                    </div>
+                  </div>
+                  <span className="shrink-0 font-semibold tabular-nums text-rose-600 text-sm">{formatRupiah(e.amount)}</span>
+                </div>
+              ))}
+            </div>
+            {data.recentExpenses.length > 10 && (
+              <p className="mt-2 text-xs text-muted-foreground text-center">
+                +{data.recentExpenses.length - 10} pengeluaran lainnya — <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={() => setView('tutup-buku')}>Lihat semua</Button>
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Weekly trend */}
       {data.weeklyTrend && data.weeklyTrend.length > 0 && (
         <Card className="mt-6 animate-fade-in-up">
@@ -210,7 +266,14 @@ export function DashboardView() {
 
       {/* Branch detail cards */}
       <div className="mt-6">
-        <h2 className="mb-4 text-lg font-semibold">Status Cabang</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Status Cabang</h2>
+          {data.recentExpenses && data.recentExpenses.length > 0 && (
+            <Button variant="ghost" size="sm" className="gap-1 text-xs" onClick={() => setView('tutup-buku')}>
+              <Wallet className="h-3.5 w-3.5" /> Pengeluaran Hari Ini
+            </Button>
+          )}
+        </div>
         <div className="grid gap-4 md:grid-cols-2">
           {data.branches.map((b) => (
             <Card key={b.branch.id} className="overflow-hidden">

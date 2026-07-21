@@ -1,0 +1,172 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "hermes-agent",
+  "elements": [
+    {
+      "type": "text",
+      "id": "title",
+      "x": 180,
+      "y": 20,
+      "width": 840,
+      "height": 35,
+      "text": "🧺 Putry Laundry POS — Panduan Lengkap untuk User",
+      "fontSize": 28,
+      "fontFamily": 1,
+      "strokeColor": "#1e1e1e",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "originalText": "🧺 Putry Laundry POS — Panduan Lengkap untuk User",
+      "autoResize": true
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "x": 280,
+      "y": 58,
+      "width": 640,
+      "height": 22,
+      "text": "Cara pakai seluruh fitur + alur sistem + hal yang perlu diperhatikan",
+      "fontSize": 18,
+      "fontFamily": 1,
+      "strokeColor": "#666666",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "originalText": "Cara pakai seluruh fitur + alur sistem + hal yang perlu diperhatikan",
+      "autoResize": true
+    },
+
+    {"type":"rectangle","id":"login_bg","x":470,"y":110,"width":260,"height":60,"roundness":{"type":3},"backgroundColor":"#a5d8ff","fillStyle":"solid","boundElements":[{"id":"t_login","type":"text"},{"id":"a_login_dash","type":"arrow"}]},
+    {"type":"text","id":"t_login","x":475,"y":120,"width":250,"height":40,"text":"🔑 LOGIN\nMasukkan kode akses", "fontSize":16,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","containerId":"login_bg","originalText":"🔑 LOGIN\nMasukkan kode akses","autoResize":true},
+
+    {"type":"arrow","id":"a_login_dash","x":600,"y":170,"width":0,"height":40,"points":[[0,0],[0,40]],"endArrowhead":"arrow","startBinding":{"elementId":"login_bg","fixedPoint":[0.5,1]},"endBinding":{"elementId":"dash_bg","fixedPoint":[0.5,0]}},
+
+    {"type":"rectangle","id":"dash_bg","x":440,"y":210,"width":320,"height":80,"roundness":{"type":3},"backgroundColor":"#d0bfff","fillStyle":"solid","boundElements":[{"id":"t_dash","type":"text"},{"id":"a_dash_order","type":"arrow"},{"id":"a_dash_uang","type":"arrow"},{"id":"a_dash_cari","type":"arrow"}]},
+    {"type":"text","id":"t_dash","x":448,"y":218,"width":304,"height":64,"text":"🏠 DASHBOARD (HOME)\nHalaman utama — ringkasan hari ini:\nPendapatan · Pengeluaran · Laba · Pesanan pending","fontSize":15,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","containerId":"dash_bg","originalText":"🏠 DASHBOARD (HOME)\nHalaman utama — ringkasan hari ini: Pendapatan · Pengeluaran · Laba · Pesanan pending","autoResize":true},
+
+    {"type":"text","id":"nav_hint","x":320,"y":300,"width":560,"height":20,"text":"Pilih menu navigasi di bawah untuk mengelola toko:","fontSize":16,"fontFamily":1,"strokeColor":"#666666","textAlign":"center","verticalAlign":"middle","originalText":"Pilih menu navigasi di bawah untuk mengelola toko:","autoResize":true},
+
+    {"type":"arrow","id":"a_dash_order","x":440,"y":250,"width":-140,"height":80,"points":[[0,0],[-140,0],[0,80]],"endArrowhead":"arrow","startBinding":{"elementId":"dash_bg","fixedPoint":[0,0.5]},"endBinding":{"elementId":"order_header","fixedPoint":[0.5,0]}},
+    {"type":"arrow","id":"a_dash_uang","x":600,"y":290,"width":0,"height":60,"points":[[0,0],[0,60]],"endArrowhead":"arrow","startBinding":{"elementId":"dash_bg","fixedPoint":[0.5,1]},"endBinding":{"elementId":"uang_header","fixedPoint":[0.5,0]}},
+    {"type":"arrow","id":"a_dash_cari","x":760,"y":250,"width":140,"height":80,"points":[[0,0],[140,0],[0,80]],"endArrowhead":"arrow","startBinding":{"elementId":"dash_bg","fixedPoint":[1,0.5]},"endBinding":{"elementId":"cari_header","fixedPoint":[0.5,0]}},
+
+    {"type":"rectangle","id":"order_header","x":20,"y":330,"width":340,"height":45,"roundness":{"type":3},"backgroundColor":"#a5d8ff","fillStyle":"solid","boundElements":[{"id":"t_order_h","type":"text"}]},
+    {"type":"text","id":"t_order_h","x":25,"y":340,"width":330,"height":25,"text":"📋 ORDER — Buat Pesanan Baru","fontSize":18,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","containerId":"order_header","originalText":"📋 ORDER — Buat Pesanan Baru","autoResize":true},
+
+    {"type":"text","id":"order_desc","x":25,"y":380,"width":330,"height":35,"text":"Ikuti 6 langkah berurutan ini untuk mencatat order baru:","fontSize":13,"fontFamily":1,"strokeColor":"#666666","textAlign":"left","verticalAlign":"middle","originalText":"Ikuti 6 langkah berurutan ini untuk mencatat order baru:","autoResize":true},
+
+    {"type":"rectangle","id":"o1","x":30,"y":420,"width":320,"height":38,"roundness":{"type":3},"backgroundColor":"#e7f5ff","fillStyle":"solid","boundElements":[{"id":"t_o1","type":"text"},{"id":"a_o1_o2","type":"arrow"}]},
+    {"type":"text","id":"t_o1","x":35,"y":426,"width":310,"height":26,"text":"1️⃣ Pilih Cabang (A / B)","fontSize":15,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","containerId":"o1","originalText":"1️⃣ Pilih Cabang (A / B)","autoResize":true},
+
+    {"type":"arrow","id":"a_o1_o2","x":190,"y":458,"width":0,"height":20,"points":[[0,0],[0,20]],"endArrowhead":"arrow","startBinding":{"elementId":"o1","fixedPoint":[0.5,1]},"endBinding":{"elementId":"o2","fixedPoint":[0.5,0]}},
+
+    {"type":"rectangle","id":"o2","x":30,"y":478,"width":320,"height":38,"roundness":{"type":3},"backgroundColor":"#e7f5ff","fillStyle":"solid","boundElements":[{"id":"t_o2","type":"text"},{"id":"a_o2_o3","type":"arrow"}]},
+    {"type":"text","id":"t_o2","x":35,"y":484,"width":310,"height":26,"text":"2️⃣ Masukkan BERAT (KG) untuk Jasa Reguler","fontSize":15,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","containerId":"o2","originalText":"2️⃣ Masukkan BERAT (KG) untuk Jasa Reguler","autoResize":true},
+
+    {"type":"arrow","id":"a_o2_o3","x":190,"y":516,"width":0,"height":20,"points":[[0,0],[0,20]],"endArrowhead":"arrow","startBinding":{"elementId":"o2","fixedPoint":[0.5,1]},"endBinding":{"elementId":"o3","fixedPoint":[0.5,0]}},
+
+    {"type":"rectangle","id":"o3","x":30,"y":536,"width":320,"height":38,"roundness":{"type":3},"backgroundColor":"#e7f5ff","fillStyle":"solid","boundElements":[{"id":"t_o3","type":"text"},{"id":"a_o3_o4","type":"arrow"}]},
+    {"type":"text","id":"t_o3","x":35,"y":542,"width":310,"height":26,"text":"3️⃣ Tambah item NON-KILO (Bed Cover, Selimut,dll)","fontSize":15,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","containerId":"o3","originalText":"3️⃣ Tambah item NON-KILO (Bed Cover, Selimut,dll)","autoResize":true},
+
+    {"type":"arrow","id":"a_o3_o4","x":190,"y":574,"width":0,"height":20,"points":[[0,0],[0,20]],"endArrowhead":"arrow","startBinding":{"elementId":"o3","fixedPoint":[0.5,1]},"endBinding":{"elementId":"o4","fixedPoint":[0.5,0]}},
+
+    {"type":"rectangle","id":"o4","x":30,"y":594,"width":320,"height":38,"roundness":{"type":3},"backgroundColor":"#e7f5ff","fillStyle":"solid","boundElements":[{"id":"t_o4","type":"text"},{"id":"a_o4_o5","type":"arrow"}]},
+    {"type":"text","id":"t_o4","x":35,"y":600,"width":310,"height":26,"text":"4️⃣ NAMA + NO HP Pelanggan","fontSize":15,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","containerId":"o4","originalText":"4️⃣ NAMA + NO HP Pelanggan","autoResize":true},
+
+    {"type":"arrow","id":"a_o4_o5","x":190,"y":632,"width":0,"height":20,"points":[[0,0],[0,20]],"endArrowhead":"arrow","startBinding":{"elementId":"o4","fixedPoint":[0.5,1]},"endBinding":{"elementId":"o5","fixedPoint":[0.5,0]}},
+
+    {"type":"rectangle","id":"o5","x":30,"y":652,"width":320,"height":38,"roundness":{"type":3},"backgroundColor":"#e7f5ff","fillStyle":"solid","boundElements":[{"id":"t_o5","type":"text"},{"id":"a_o5_o6","type":"arrow"}]},
+    {"type":"text","id":"t_o5","x":35,"y":658,"width":310,"height":26,"text":"5️⃣ Pilih TANGGAL Ambil","fontSize":15,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","containerId":"o5","originalText":"5️⃣ Pilih TANGGAL Ambil","autoResize":true},
+
+    {"type":"arrow","id":"a_o5_o6","x":190,"y":690,"width":0,"height":20,"points":[[0,0],[0,20]],"endArrowhead":"arrow","startBinding":{"elementId":"o5","fixedPoint":[0.5,1]},"endBinding":{"elementId":"o6","fixedPoint":[0.5,0]}},
+
+    {"type":"rectangle","id":"o6","x":30,"y":710,"width":320,"height":55,"roundness":{"type":3},"backgroundColor":"#b2f2bb","fillStyle":"solid","boundElements":[{"id":"t_o6","type":"text"},{"id":"a_o6_bayar","type":"arrow"}]},
+    {"type":"text","id":"t_o6","x":35,"y":717,"width":310,"height":41,"text":"6️⃣ Pilih NOTA (A4/A5)\nSetelah order tersimpan → lanjut ke PEMBAYARAN","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","containerId":"o6","originalText":"6️⃣ Pilih NOTA (A4/A5)\nSetelah order tersimpan → lanjut ke PEMBAYARAN","autoResize":true},
+
+    {"type":"arrow","id":"a_o6_bayar","x":190,"y":765,"width":0,"height":25,"points":[[0,0],[0,25]],"endArrowhead":"arrow","startBinding":{"elementId":"o6","fixedPoint":[0.5,1]},"endBinding":{"elementId":"o_bayar","fixedPoint":[0.5,0]}},
+
+    {"type":"diamond","id":"o_bayar","x":60,"y":790,"width":260,"height":65,"backgroundColor":"#fff3bf","fillStyle":"solid","boundElements":[{"id":"t_o_bayar","type":"text"},{"id":"a_bayar_lunas","type":"arrow"},{"id":"a_bayar_belum","type":"arrow"}]},
+    {"type":"text","id":"t_o_bayar","x":65,"y":800,"width":250,"height":45,"text":"Pilih status bayar:\nLUNAS atau BELUM BAYAR?","fontSize":14,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","containerId":"o_bayar","originalText":"Pilih status bayar:\nLUNAS atau BELUM BAYAR?","autoResize":true},
+
+    {"type":"arrow","id":"a_bayar_lunas","x":60,"y":820,"width":-30,"height":40,"points":[[0,0],[-30,-20],[-40,20]],"endArrowhead":"arrow","startBinding":{"elementId":"o_bayar","fixedPoint":[0,0.45]},"endBinding":{"elementId":"o_lunas","fixedPoint":[1,0.5]}},
+    {"type":"rectangle","id":"o_lunas","x":-10,"y":825,"width":100,"height":38,"roundness":{"type":3},"backgroundColor":"#b2f2bb","fillStyle":"solid","boundElements":[{"id":"t_o_lunas","type":"text"}]},
+    {"type":"text","id":"t_o_lunas","x":-5,"y":831,"width":90,"height":26,"text":"✅ LUNAS\nIsi jumlah uang","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","containerId":"o_lunas","originalText":"✅ LUNAS\nIsi jumlah uang","autoResize":true},
+
+    {"type":"arrow","id":"a_bayar_belum","x":320,"y":810,"width":30,"height":0,"points":[[0,0],[30,0]],"endArrowhead":"arrow","startBinding":{"elementId":"o_bayar","fixedPoint":[1,0.3]},"endBinding":{"elementId":"o_belum","fixedPoint":[0,0.5]}},
+    {"type":"rectangle","id":"o_belum","x":350,"y":795,"width":110,"height":38,"roundness":{"type":3},"backgroundColor":"#ffd8a8","fillStyle":"solid","boundElements":[{"id":"t_o_belum","type":"text"}]},
+    {"type":"text","id":"t_o_belum","x":355,"y":801,"width":100,"height":26,"text":"🟡 BELUM BAYAR\nOrder tetap jalan","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","containerId":"o_belum","originalText":"🟡 BELUM BAYAR\nOrder tetap jalan","autoResize":true},
+
+    {"type":"rectangle","id":"order_notes","x":20,"y":880,"width":340,"height":80,"roundness":{"type":3},"backgroundColor":"#fff3bf","fillStyle":"solid","boundElements":[{"id":"t_order_notes","type":"text"}]},
+    {"type":"text","id":"t_order_notes","x":25,"y":887,"width":330,"height":66,"text":"⚠️ Catatan:\n• Nota tercetak otomatis setelah bayar\n• Order dengan status BELUM BAYAR tetap tampil di dashboard\n• Kustomr yang sudah punya riwayat otomatis terdeteksi oleh sistem","fontSize":12,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"top","containerId":"order_notes","originalText":"⚠️ Catatan:\n• Nota tercetak otomatis setelah bayar\n• Order dengan status BELUM BAYAR tetap tampil di dashboard\n• Kustomr yang sudah punya riwayat otomatis terdeteksi oleh sistem","autoResize":true},
+
+    {"type":"rectangle","id":"uang_header","x":420,"y":330,"width":340,"height":45,"roundness":{"type":3},"backgroundColor":"#b2f2bb","fillStyle":"solid","boundElements":[{"id":"t_uang_h","type":"text"}]},
+    {"type":"text","id":"t_uang_h","x":425,"y":340,"width":330,"height":25,"text":"💰 UANG — Keuangan & Tutup Buku","fontSize":18,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","containerId":"uang_header","originalText":"💰 UANG — Keuangan & Tutup Buku","autoResize":true},
+
+    {"type":"text","id":"uang_desc","x":425,"y":380,"width":330,"height":35,"text":"Kelola pemasukan, pengeluaran, dan tutup buku harian:","fontSize":13,"fontFamily":1,"strokeColor":"#666666","textAlign":"left","verticalAlign":"middle","originalText":"Kelola pemasukan, pengeluaran, dan tutup buku harian:","autoResize":true},
+
+    {"type":"rectangle","id":"u1","x":430,"y":420,"width":320,"height":38,"roundness":{"type":3},"backgroundColor":"#d3f9d8","fillStyle":"solid","boundElements":[{"id":"t_u1","type":"text"},{"id":"a_u1_u2","type":"arrow"}]},
+    {"type":"text","id":"t_u1","x":435,"y":426,"width":310,"height":26,"text":"📊 Lihat Ringkasan per Cabang","fontSize":15,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","containerId":"u1","originalText":"📊 Lihat Ringkasan per Cabang","autoResize":true},
+
+    {"type":"arrow","id":"a_u1_u2","x":590,"y":458,"width":0,"height":20,"points":[[0,0],[0,20]],"endArrowhead":"arrow","startBinding":{"elementId":"u1","fixedPoint":[0.5,1]},"endBinding":{"elementId":"u2","fixedPoint":[0.5,0]}},
+
+    {"type":"rectangle","id":"u2","x":430,"y":478,"width":320,"height":55,"roundness":{"type":3},"backgroundColor":"#fff3bf","fillStyle":"solid","boundElements":[{"id":"t_u2","type":"text"},{"id":"a_u2_u3","type":"arrow"}]},
+    {"type":"text","id":"t_u2","x":435,"y":483,"width":310,"height":45,"text":"➕ TAMBAH PENGELUARAN\nPilih kategori: Detergen, Parfum, Plastik,\nListrik, Air, Gaji, Transport, dll","fontSize":12,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"top","containerId":"u2","originalText":"➕ TAMBAH PENGELUARAN\nPilih kategori: Detergen, Parfum, Plastik, Listrik, Air, Gaji, Transport, dll","autoResize":true},
+
+    {"type":"arrow","id":"a_u2_u3","x":590,"y":533,"width":0,"height":20,"points":[[0,0],[0,20]],"endArrowhead":"arrow","startBinding":{"elementId":"u2","fixedPoint":[0.5,1]},"endBinding":{"elementId":"u3","fixedPoint":[0.5,0]}},
+
+    {"type":"rectangle","id":"u3","x":430,"y":553,"width":320,"height":55,"roundness":{"type":3},"backgroundColor":"#d0bfff","fillStyle":"solid","boundElements":[{"id":"t_u3","type":"text"},{"id":"a_u3_u4","type":"arrow"}]},
+    {"type":"text","id":"t_u3","x":435,"y":558,"width":310,"height":45,"text":"📁 TUTUP BUKU\nFinalisasi harian — laba bersih masuk ke\nREKAP UTAMA, dana operasional dipisah","fontSize":12,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"top","containerId":"u3","originalText":"📁 TUTUP BUKU\nFinalisasi harian — laba bersih masuk ke REKAP UTAMA, dana operasional dipisah","autoResize":true},
+
+    {"type":"arrow","id":"a_u3_u4","x":590,"y":608,"width":0,"height":20,"points":[[0,0],[0,20]],"endArrowhead":"arrow","startBinding":{"elementId":"u3","fixedPoint":[0.5,1]},"endBinding":{"elementId":"u4","fixedPoint":[0.5,0]}},
+
+    {"type":"rectangle","id":"u4","x":430,"y":628,"width":320,"height":55,"roundness":{"type":3},"backgroundColor":"#b2f2bb","fillStyle":"solid","boundElements":[{"id":"t_u4","type":"text"}]},
+    {"type":"text","id":"t_u4","x":435,"y":633,"width":310,"height":45,"text":"📈 LAPORAN (Laba Rugi)\nLihat laporan periode tertentu —\npendapatan, pengeluaran, laba bersih","fontSize":12,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"top","containerId":"u4","originalText":"📈 LAPORAN (Laba Rugi)\nLihat laporan periode tertentu — pendapatan, pengeluaran, laba bersih","autoResize":true},
+
+    {"type":"rectangle","id":"uang_notes","x":420,"y":710,"width":340,"height":80,"roundness":{"type":3},"backgroundColor":"#fff3bf","fillStyle":"solid","boundElements":[{"id":"t_uang_notes","type":"text"}]},
+    {"type":"text","id":"t_uang_notes","x":425,"y":717,"width":330,"height":66,"text":"⚠️ Catatan:\n• Catat pengeluaran SETIAP HARI jangan sampai lupa\n• Setelah tutup buku, data tidak bisa diedit\n• Tutup buku dilakukan per cabang","fontSize":12,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"top","containerId":"uang_notes","originalText":"⚠️ Catatan:\n• Catat pengeluaran SETIAP HARI jangan sampai lupa\n• Setelah tutup buku, data tidak bisa diedit\n• Tutup buku dilakukan per cabang","autoResize":true},
+
+    {"type":"rectangle","id":"cari_header","x":820,"y":330,"width":340,"height":45,"roundness":{"type":3},"backgroundColor":"#ffd8a8","fillStyle":"solid","boundElements":[{"id":"t_cari_h","type":"text"}]},
+    {"type":"text","id":"t_cari_h","x":825,"y":340,"width":330,"height":25,"text":"🔍 CARI — Cari & Kelola Pesanan","fontSize":18,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","containerId":"cari_header","originalText":"🔍 CARI — Cari & Kelola Pesanan","autoResize":true},
+
+    {"type":"text","id":"cari_desc","x":825,"y":380,"width":330,"height":35,"text":"Temukan dan kelola semua pesanan dengan mudah:","fontSize":13,"fontFamily":1,"strokeColor":"#666666","textAlign":"left","verticalAlign":"middle","originalText":"Temukan dan kelola semua pesanan dengan mudah:","autoResize":true},
+
+    {"type":"rectangle","id":"c1","x":830,"y":420,"width":320,"height":55,"roundness":{"type":3},"backgroundColor":"#fff0cc","fillStyle":"solid","boundElements":[{"id":"t_c1","type":"text"},{"id":"a_c1_c2","type":"arrow"}]},
+    {"type":"text","id":"t_c1","x":835,"y":425,"width":310,"height":45,"text":"🔎 CARI TRANSAKSI\nCari berdasarkan: No Invoice, Nama\nPelanggan, atau filter Tanggal","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"top","containerId":"c1","originalText":"🔎 CARI TRANSAKSI\nCari berdasarkan: No Invoice, Nama Pelanggan, atau filter Tanggal","autoResize":true},
+
+    {"type":"arrow","id":"a_c1_c2","x":990,"y":475,"width":0,"height":20,"points":[[0,0],[0,20]],"endArrowhead":"arrow","startBinding":{"elementId":"c1","fixedPoint":[0.5,1]},"endBinding":{"elementId":"c2","fixedPoint":[0.5,0]}},
+
+    {"type":"rectangle","id":"c2","x":830,"y":495,"width":320,"height":55,"roundness":{"type":3},"backgroundColor":"#fff0cc","fillStyle":"solid","boundElements":[{"id":"t_c2","type":"text"},{"id":"a_c2_c3","type":"arrow"}]},
+    {"type":"text","id":"t_c2","x":835,"y":500,"width":310,"height":45,"text":"📋 FILTER STATUS\nFilter berdasarkan: Status (Proses/Selesai/Diambil)\ndan Status Bayar (Lunas/Belum Bayar)","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"top","containerId":"c2","originalText":"📋 FILTER STATUS\nFilter berdasarkan: Status (Proses/Selesai/Diambil) dan Status Bayar (Lunas/Belum Bayar)","autoResize":true},
+
+    {"type":"arrow","id":"a_c2_c3","x":990,"y":550,"width":0,"height":20,"points":[[0,0],[0,20]],"endArrowhead":"arrow","startBinding":{"elementId":"c2","fixedPoint":[0.5,1]},"endBinding":{"elementId":"c3","fixedPoint":[0.5,0]}},
+
+    {"type":"rectangle","id":"c3","x":830,"y":570,"width":320,"height":55,"roundness":{"type":3},"backgroundColor":"#fff0cc","fillStyle":"solid","boundElements":[{"id":"t_c3","type":"text"},{"id":"a_c3_c4","type":"arrow"}]},
+    {"type":"text","id":"t_c3","x":835,"y":575,"width":310,"height":45,"text":"📄 DETAIL PESANAN\nLihat rincian lengkap: layanan, harga,\ncatatan, dan histori pembayaran","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"top","containerId":"c3","originalText":"📄 DETAIL PESANAN\nLihat rincian lengkap: layanan, harga, catatan, dan histori pembayaran","autoResize":true},
+
+    {"type":"arrow","id":"a_c3_c4","x":990,"y":625,"width":0,"height":20,"points":[[0,0],[0,20]],"endArrowhead":"arrow","startBinding":{"elementId":"c3","fixedPoint":[0.5,1]},"endBinding":{"elementId":"c4","fixedPoint":[0.5,0]}},
+
+    {"type":"rectangle","id":"c4","x":830,"y":645,"width":320,"height":55,"roundness":{"type":3},"backgroundColor":"#b2f2bb","fillStyle":"solid","boundElements":[{"id":"t_c4","type":"text"}]},
+    {"type":"text","id":"t_c4","x":835,"y":650,"width":310,"height":45,"text":"🔄 UPDATE STATUS\nUbah status: Dari Proses → Selesai\n→ Diambil. Pembayaran bisa diubah","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"top","containerId":"c4","originalText":"🔄 UPDATE STATUS\nUbah status: Dari Proses → Selesai → Diambil. Pembayaran bisa diubah","autoResize":true},
+
+    {"type":"rectangle","id":"cari_notes","x":820,"y":710,"width":340,"height":80,"roundness":{"type":3},"backgroundColor":"#fff3bf","fillStyle":"solid","boundElements":[{"id":"t_cari_notes","type":"text"}]},
+    {"type":"text","id":"t_cari_notes","x":825,"y":717,"width":330,"height":66,"content":"⚠️ Catatan:\n• Pesanan yang SELESAI tapi belum DIAMBIL akan muncul di dashboard\n• Tekan tombol TELEPON untuk WA pelanggan langsung dari halaman list","fontSize":12,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"top","containerId":"cari_notes","originalText":"⚠️ Catatan:\n• Pesanan yang SELESAI tapi belum DIAMBIL akan muncul di dashboard\n• Tekan tombol TELEPON untuk WA pelanggan langsung dari halaman list","autoResize":true},
+
+    {"type":"rectangle","id":"alur_header","x":50,"y":990,"width":1100,"height":40,"roundness":{"type":3},"backgroundColor":"#d0bfff","fillStyle":"solid","boundElements":[{"id":"t_alur_h","type":"text"}]},
+    {"type":"text","id":"t_alur_h","x":55,"y":998,"width":1090,"height":24,"text":"🔄 ALUR SISTEM — Cara Kerja Aplikasi dari Awal sampai Akhir","fontSize":18,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","containerId":"alur_header","originalText":"🔄 ALUR SISTEM — Cara Kerja Aplikasi dari Awal sampai Akhir","autoResize":true},
+
+    {"type":"rectangle","id":"alur_steps","x":50,"y":1040,"width":1100,"height":100,"roundness":{"type":3},"backgroundColor":"#f8f9fa","fillStyle":"solid","boundElements":[{"id":"t_alur_s","type":"text"}]},
+    {"type":"text","id":"t_alur_s","x":55,"y":1045,"width":1090,"height":90,"content":"Step 1: Pelanggan datang → buat ORDER (lengkap 6 langkah + bayar) → Step 2: Cucian diproses (status: PROSES) → Step 3: Operator ubah status ke SELESAI → Step 4: Pelanggan diinfo lewat telepon/WA → Step 5: Pelanggan ambil → operator ubah status ke DIAMBIL → Step 6: Akhir hari → operator TUTUP BUKU per cabang → data otomatis masuk REKAP UTAMA","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"top","containerId":"alur_steps","originalText":"Step 1: Pelanggan datang → buat ORDER (lengkap 6 langkah + bayar) → Step 2: Cucian diproses (status: PROSES) → Step 3: Operator ubah status ke SELESAI → Step 4: Pelanggan diinfo lewat telepon/WA → Step 5: Pelanggan ambil → operator ubah status ke DIAMBIL → Step 6: Akhir hari → operator TUTUP BUKU per cabang → data otomatis masuk REKAP UTAMA","autoResize":true},
+
+    {"type":"rectangle","id":"invoice_info","x":50,"y":1150,"width":540,"height":100,"roundness":{"type":3},"backgroundColor":"#d3f9d8","fillStyle":"solid","boundElements":[{"id":"t_inv_i","type":"text"}]},
+    {"type":"text","id":"t_inv_i","x":55,"y":1155,"width":530,"height":90,"content":"📄 FORMAT INVOICE\nINV-{KODE CABANG}-{YYYYMMDD}-{NO URUT}\nContoh: INV-A-20260721-003\n→ Berarti: Cabang A, tgl 21 Juli 2026, order ke-3 hari itu\n→ NOMOR URUT reset setiap hari (per cabang)","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"top","containerId":"invoice_info","originalText":"📄 FORMAT INVOICE\nINV-{KODE CABANG}-{YYYYMMDD}-{NO URUT}\nContoh: INV-A-20260721-003\n→ Berarti: Cabang A, tgl 21 Juli 2026, order ke-3 hari itu\n→ NOMOR URUT reset setiap hari (per cabang)","autoResize":true},
+
+    {"type":"rectangle","id":"tracking_info","x":610,"y":1150,"width":540,"height":100,"roundness":{"type":3},"backgroundColor":"#e7f5ff","fillStyle":"solid","boundElements":[{"id":"t_track_i","type":"text"}]},
+    {"type":"text","id":"t_track_i","x":615,"y":1155,"width":530,"height":90,"content":"📊 FITUR TRACKING\n• Order ke-N dari pelanggan (CustomerOrderIndex)\n• Filter pembayaran: LUNAS / BELUM LUNAS\n• Overdue widget: pesanan selesai >3 hari belum diambil\n• Pengeluaran hari ini langsung terlihat di dashboard","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"top","containerId":"tracking_info","originalText":"📊 FITUR TRACKING\n• Order ke-N dari pelanggan (CustomerOrderIndex)\n• Filter pembayaran: LUNAS / BELUM LUNAS\n• Overdue widget: pesanan selesai >3 hari belum diambil\n• Pengeluaran hari ini langsung terlihat di dashboard","autoResize":true},
+
+    {"type":"rectangle","id":"warning_box","x":50,"y":1280,"width":1100,"height":130,"roundness":{"type":3},"backgroundColor":"#ffc9c9","fillStyle":"solid","boundElements":[{"id":"t_warn","type":"text"}]},
+    {"type":"text","id":"t_warn","x":55,"y":1286,"width":1090,"height":118,"content":"🚨 HAL-HAL YANG PERLU DIPERHATIKAN\n\n1. TUTUP BUKU SETIAP HARI — Jangan sampai lupa! Setelah tutup buku, data otomatis masuk rekap. Kalau belum tutup buku, laba belum tercatat.\n2. CATAT SEMUA PENGELUARAN — Detergen, gaji, listrik, transport, dll. Semua harus masuk biar laba rugi akurat.\n3. ORDER BELUM BAYAR — Akan terus muncul di dashboard. Jangan sampai order jalan tanpa bayar kecuali memang sudah deal.\n4. STATUS ORDER — Pastikan update status: PROSES → SELESAI (cucian siap) → DIAMBIL (pelanggan sudah ambil). Jangan sampai lupa update biar tracking akurat.\n5. NOMOR HP PELANGGAN — Isi nomor HP untuk memudahkan kontak/WA via aplikasi.","fontSize":12,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"top","containerId":"warning_box","originalText":"🚨 HAL-HAL YANG PERLU DIPERHATIKAN\n\n1. TUTUP BUKU SETIAP HARI — Jangan sampai lupa! Setelah tutup buku, data otomatis masuk rekap.\n2. CATAT SEMUA PENGELUARAN — Detergen, gaji, listrik, transport, dll. Semua harus masuk biar laba rugi akurat.\n3. ORDER BELUM BAYAR — Akan terus muncul di dashboard. Jangan sampai order jalan tanpa bayar.\n4. STATUS ORDER — Pastikan update status: PROSES → SELESAI → DIAMBIL. Jangan sampai lupa update.\n5. NOMOR HP PELANGGAN — Isi nomor HP untuk memudahkan kontak/WA via aplikasi.","autoResize":true}
+  ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff"
+  }
+}
