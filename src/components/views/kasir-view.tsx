@@ -107,7 +107,7 @@ export function KasirView() {
             phone: customerPhone.trim() || null,
             branchId: selectedBranch || null,
           })
-          finalCustomerId = custRes.data.id
+          finalCustomerId = (custRes as { data: { id: string } }).data.id
         } catch {
           // Customer creation failed (maybe duplicate) - continue without linking
           console.error('Auto-save customer failed, continuing without link')
@@ -134,11 +134,11 @@ export function KasirView() {
         })),
       })
       setLastInvoice({
-        invoiceNo: res.data.invoiceNo,
-        total: res.data.totalAmount,
-        paid: res.data.paidAmount,
-        change: res.data.changeAmount,
-        customerName: res.data.customerName,
+        invoiceNo: (res as { data: { invoiceNo: string; totalAmount: number; paidAmount: number; changeAmount: number } }).data.invoiceNo,
+        total: (res as { data: { invoiceNo: string; totalAmount: number; paidAmount: number; changeAmount: number } }).data.totalAmount,
+        paid: (res as { data: { invoiceNo: string; totalAmount: number; paidAmount: number; changeAmount: number } }).data.paidAmount,
+        change: (res as { data: { invoiceNo: string; totalAmount: number; paidAmount: number; changeAmount: number; customerName: string } }).data.changeAmount,
+        customerName: (res as { data: { invoiceNo: string; totalAmount: number; paidAmount: number; changeAmount: number; customerName: string } }).data.customerName,
         items: items.map((i) => ({ variant: i.variant })),
       })
       clearCart()
@@ -149,7 +149,7 @@ export function KasirView() {
       setPaidAmount('')
       setNotes('')
       setCheckoutOpen(false)
-      toast.success(`Transaksi ${res.data.invoiceNo} berhasil dibuat`)
+      toast.success(`Transaksi ${(res as { data: { invoiceNo: string } }).data.invoiceNo} berhasil dibuat`)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Gagal membuat transaksi')
     }

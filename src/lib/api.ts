@@ -18,6 +18,21 @@ async function fetcher<T>(url: string): Promise<T> {
   return res.json()
 }
 
+// Mutation helper — same auto-auth, handles JSON body for POST/PATCH and bare DELETE
+// ponytail: fuse with fetcher() when React Query v6 supports unified hooks
+async function mutate<T>(url: string, options?: { method?: string; body?: unknown }): Promise<T> {
+  const res = await fetch(url, {
+    method: options?.method || 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
+    body: options?.body !== undefined ? JSON.stringify(options.body) : undefined,
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Gagal' }))
+    throw new Error(err.error)
+  }
+  return res.json()
+}
+
 export interface Branch {
   id: string
   name: string
@@ -273,16 +288,7 @@ export function useCreateTransaction() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (data: Record<string, unknown>) => {
-      const res = await fetch('/api/transactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Gagal' }))
-        throw new Error(err.error)
-      }
-      return res.json()
+      return mutate('/api/transactions', { body: data })
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['transactions'] })
@@ -295,16 +301,7 @@ export function useUpdateTransaction() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...data }: { id: string } & Record<string, unknown>) => {
-      const res = await fetch(`/api/transactions/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Gagal' }))
-        throw new Error(err.error)
-      }
-      return res.json()
+      return mutate(`/api/transactions/${id}`, { method: 'PATCH', body: data })
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['transactions'] })
@@ -317,16 +314,7 @@ export function useCreateExpense() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (data: Record<string, unknown>) => {
-      const res = await fetch('/api/expenses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Gagal' }))
-        throw new Error(err.error)
-      }
-      return res.json()
+      return mutate('/api/expenses', { body: data })
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['expenses'] })
@@ -339,16 +327,7 @@ export function useDailyClose() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (data: { branchId: string; date?: string; notes?: string }) => {
-      const res = await fetch('/api/daily-closing', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Gagal' }))
-        throw new Error(err.error)
-      }
-      return res.json()
+      return mutate('/api/daily-closing', { body: data })
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['daily-closings'] })
@@ -362,16 +341,7 @@ export function useCreateService() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (data: Record<string, unknown>) => {
-      const res = await fetch('/api/services', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Gagal' }))
-        throw new Error(err.error)
-      }
-      return res.json()
+      return mutate('/api/services', { body: data })
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['services'] }),
   })
@@ -381,16 +351,7 @@ export function useUpdateService() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...data }: { id: string } & Record<string, unknown>) => {
-      const res = await fetch(`/api/services/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Gagal' }))
-        throw new Error(err.error)
-      }
-      return res.json()
+      return mutate(`/api/services/${id}`, { method: 'PATCH', body: data })
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['services'] }),
   })
@@ -400,16 +361,7 @@ export function useUpdateBranch() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...data }: { id: string } & Record<string, unknown>) => {
-      const res = await fetch(`/api/branches/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Gagal' }))
-        throw new Error(err.error)
-      }
-      return res.json()
+      return mutate(`/api/branches/${id}`, { method: 'PATCH', body: data })
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['branches'] }),
   })
@@ -419,16 +371,7 @@ export function useCreateBranch() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (data: Record<string, unknown>) => {
-      const res = await fetch('/api/branches', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Gagal' }))
-        throw new Error(err.error)
-      }
-      return res.json()
+      return mutate('/api/branches', { body: data })
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['branches'] }),
   })
@@ -453,12 +396,7 @@ export function useDeleteTransaction() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/transactions/${id}`, { method: 'DELETE' })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Gagal' }))
-        throw new Error(err.error)
-      }
-      return res.json()
+      return mutate(`/api/transactions/${id}`, { method: 'DELETE' })
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['transactions'] })
@@ -472,12 +410,7 @@ export function useDeleteExpense() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/expenses/${id}`, { method: 'DELETE' })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Gagal' }))
-        throw new Error(err.error)
-      }
-      return res.json()
+      return mutate(`/api/expenses/${id}`, { method: 'DELETE' })
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['expenses'] })
@@ -518,16 +451,7 @@ export function useCreateCustomer() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (data: Record<string, unknown>) => {
-      const res = await fetch('/api/customers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Gagal' }))
-        throw new Error(err.error)
-      }
-      return res.json()
+      return mutate('/api/customers', { body: data })
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['customers'] }),
   })
@@ -537,16 +461,7 @@ export function useUpdateCustomer() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...data }: { id: string } & Record<string, unknown>) => {
-      const res = await fetch(`/api/customers/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Gagal' }))
-        throw new Error(err.error)
-      }
-      return res.json()
+      return mutate(`/api/customers/${id}`, { method: 'PATCH', body: data })
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['customers'] }),
   })
@@ -556,12 +471,7 @@ export function useDeleteCustomer() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/customers/${id}`, { method: 'DELETE' })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Gagal' }))
-        throw new Error(err.error)
-      }
-      return res.json()
+      return mutate(`/api/customers/${id}`, { method: 'DELETE' })
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['customers'] }),
   })
