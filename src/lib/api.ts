@@ -254,10 +254,14 @@ export function useDailyClosings(branchId?: string, date?: string) {
   })
 }
 
-export function useMainRecaps() {
+export function useMainRecaps(startDate?: string, endDate?: string) {
+  const qs = new URLSearchParams()
+  if (startDate) qs.set('startDate', startDate)
+  if (endDate) qs.set('endDate', endDate)
+  const query = qs.toString()
   return useQuery<MainRecap[]>({
-    queryKey: ['main-recaps'],
-    queryFn: () => fetcher<{ success: boolean; data: MainRecap[] }>('/api/recap').then((r) => r.data),
+    queryKey: ['main-recaps', startDate, endDate],
+    queryFn: () => fetcher<{ success: boolean; data: MainRecap[] }>(`/api/recap${query ? `?${query}` : ''}`).then((r) => r.data),
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
   })

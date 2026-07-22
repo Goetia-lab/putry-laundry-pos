@@ -1,21 +1,34 @@
 'use client'
 
+import { useState } from 'react'
 import { useMainRecaps } from '@/lib/api'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
 import { PageHeader, EmptyState, StatCard } from '@/components/shared/ui-bits'
-import { formatRupiah, formatDate } from '@/lib/format'
+import { formatRupiah, formatDate, getLocalDateString } from '@/lib/format'
 import {
   BookOpen, TrendingUp, Wallet, Banknote, Droplets, ChevronDown, ChevronUp, Building2, ArrowRight,
 } from 'lucide-react'
-import { useState } from 'react'
 import { cn } from '@/lib/utils'
 
+function getDateDaysAgo(days: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() - days)
+  const jakartaTime = new Date(d.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }))
+  const y = jakartaTime.getFullYear()
+  const m = String(jakartaTime.getMonth() + 1).padStart(2, '0')
+  const day = String(jakartaTime.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
 export function RekapView() {
-  const { data: recaps, isLoading } = useMainRecaps()
+  const [startDate, setStartDate] = useState(getDateDaysAgo(6))
+  const [endDate, setEndDate] = useState(getLocalDateString())
+  const { data: recaps, isLoading } = useMainRecaps(startDate, endDate)
   const [expanded, setExpanded] = useState<string | null>(null)
 
   const totals = recaps?.reduce(
@@ -33,7 +46,27 @@ export function RekapView() {
     <div>
       <PageHeader title="Rekap Utama" description="Gabungan kasir utama dari seluruh cabang" />
 
-      {/* Summary */}
+      {/* Filter */}
+      <Card className="mb-6">
+        <CardContent className="flex flex-col gap-3 p-4 lg:flex-row lg:items-end lg:flex-wrap">
+          <div className="grid gap-1.5">
+            <label className="text-xs font-medium text-muted-foreground">Dari Tanggal</label>
+            <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full lg:w-[160px]" />
+          </div>
+          <div className="grid gap-1.5">
+            <label className="text-xs font-medium text-muted-foreground">Sampai Tanggal</label>
+            <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full lg:w-[160px]" />
+          </div>
+          <div className="flex flex-wrap gap-1.5 lg:ml-auto">
+            <Button variant="outline" size="sm" onClick={() => { setStartDate(getDateDaysAgo(0)); setEndDate(getLocalDateString()) }}>Hari Ini</Button>
+            <Button variant="outline" size="sm" onClick={() => { setStartDate(getDateDaysAgo(6)); setEndDate(getLocalDateString()) }}>7 Hari</Button>
+            <Button variant="outline" size="sm" onClick={() => { setStartDate(getDateDaysAgo(29)); setEndDate(getLocalDateString()) }}>30 Hari</Button>
+            <Button variant="outline" size="sm" onClick={() => { setStartDate(getDateDaysAgo(89)); setEndDate(getLocalDateString()) }}>90 Hari</Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Summary — now reflects filtered range */}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard title="Total Gross" value={formatRupiah(totals.gross)} icon={TrendingUp} variant="primary" loading={isLoading} />
         <StatCard title="Total Pengeluaran" value={formatRupiah(totals.expenses)} icon={Wallet} loading={isLoading} />
@@ -87,7 +120,6 @@ export function RekapView() {
 
                     {isOpen && (
                       <div className="border-t bg-muted/20 p-4">
-                        {/* Summary bar */}
                         <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
                           <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 p-2.5">
                             <p className="text-[10px] uppercase text-muted-foreground">Gross</p>
@@ -107,7 +139,6 @@ export function RekapView() {
                           </div>
                         </div>
 
-                        {/* Per branch entries */}
                         <div className="space-y-2">
                           {r.entries?.map((e) => (
                             <div key={e.id} className="rounded-lg border bg-card p-3">

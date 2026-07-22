@@ -5,9 +5,20 @@ import { dateFromString } from '@/lib/format'
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
+    const startDate = searchParams.get('startDate')
+    const endDate = searchParams.get('endDate')
     const limit = Number(searchParams.get('limit')) || 50
 
+    const where: Record<string, unknown> = {}
+    if (startDate && endDate) {
+      where.recapDate = {
+        gte: new Date(`${startDate}T00:00:00.000+07:00`),
+        lte: new Date(`${endDate}T23:59:59.999+07:00`),
+      }
+    }
+
     const recaps = await db.mainRecap.findMany({
+      where,
       orderBy: { recapDate: 'desc' },
       take: limit,
       include: { entries: { include: { branch: true } } },
