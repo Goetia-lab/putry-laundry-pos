@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.4 — 2026-07-23
+
+### Added
+- **Prediksi "Belum Bayar" di halaman Home**: kartu cabang sekarang nampilin jumlah & nominal transaksi pending (status BELUM_BAYAR) yang belum masuk daily closing.
+- **pendingAmount/pendingCount di database**: kolom baru di tabel `DailyClosing` — nyimpen total nominal & jumlah transaksi pending per closing.
+
+### Fixed
+- **Integrasi Supabase MCP**: service_role key & DB password disimpan aman untuk direct database access via psycopg.
+- **Schema mismatch produksi**: `prisma db push` + manual ALTER TABLE di SQL Editor benerin kolom `pendingAmount`/`pendingCount` yang hilang di DB produksi.
+- **Daily closing error 500**: kolom pending gak ada di DB → dashboard crash; sekarang udah sync full schema.
+
 ## 0.2.3 — 2026-07-22
 
 ### Added
