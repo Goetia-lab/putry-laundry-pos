@@ -143,6 +143,7 @@ export interface DashboardData {
     isClosed: boolean
     closing?: DailyClosing | null
     pendingCount: number
+    pendingAmount: number
     topServices: Array<{ name: string; category: string; qty: number; revenue: number }>
   }>
   mainRecap: (MainRecap & { entries?: MainRecapEntry[] }) | null

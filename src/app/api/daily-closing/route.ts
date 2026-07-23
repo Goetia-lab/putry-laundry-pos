@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     const dayStart = new Date(`${closingDateStr}T00:00:00.000+07:00`)
     const dayEnd = new Date(`${closingDateStr}T23:59:59.999+07:00`)
 
-    // Get all transactions for this branch on this date (paid only)
+    // Get all transactions for this branch on this date
     const transactions = await db.transaction.findMany({
       where: {
         branchId,
@@ -60,6 +60,17 @@ export async function POST(req: NextRequest) {
 
     const grossIncome = transactions.reduce((sum, t) => sum + t.totalAmount, 0)
     const transactionCount = transactions.length
+
+    // Pending (unpaid) transactions
+    const pendingTx = await db.transaction.findMany({
+      where: {
+        branchId,
+        date: { gte: dayStart, lte: dayEnd },
+        paymentStatus: 'BELUM_BAYAR',
+      },
+    })
+    const pendingAmount = pendingTx.reduce((sum, t) => sum + t.totalAmount, 0)
+    const pendingCount = pendingTx.length
 
     // Get operational expenses for this branch on this date
     const expenses = await db.operationalExpense.findMany({
@@ -88,6 +99,8 @@ export async function POST(req: NextRequest) {
         netIncome,
         transferredToMain: netIncome,
         operationalFundRetained,
+        pendingAmount,
+        pendingCount,
         status: 'CLOSED',
         notes: notes || null,
       },
@@ -98,6 +111,8 @@ export async function POST(req: NextRequest) {
         netIncome,
         transferredToMain: netIncome,
         operationalFundRetained,
+        pendingAmount,
+        pendingCount,
         status: 'CLOSED',
         notes: notes || null,
         closingTime: new Date(),

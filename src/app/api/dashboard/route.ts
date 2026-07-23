@@ -12,8 +12,13 @@ export async function GET(req: NextRequest) {
     const branches = await db.branch.findMany({ where: { isActive: true }, orderBy: { code: 'asc' } })
     const branchIds = branches.map(b => b.id)
 
-    // Batch all per-branch data in 4 parallel queries instead of N×4
-    const [allTransactions, allExpenses, allClosings, allPendingCounts] = await Promise.all([
+    // Batch all per-branch data in parallel queries instead of N×4
+    const allPendingTx = await db.transaction.findMany({
+      where: { branchId: { in: branchIds }, status: 'PROSES' },
+      select: { branchId: true, totalAmount: true },
+    })
+
+    const [allTransactions, allExpenses, allClosings] = await Promise.all([
       db.transaction.findMany({
         where: { branchId: { in: branchIds }, date: { gte: dayStart, lte: dayEnd }, paymentStatus: 'LUNAS' },
         include: { items: true },
@@ -24,16 +29,16 @@ export async function GET(req: NextRequest) {
       db.dailyClosing.findMany({
         where: { branchId: { in: branchIds }, closingDate: dateFromString(dateStr) },
       }),
-      // Aggregate pending count per branch in one query
-      db.transaction.groupBy({
-        by: ['branchId'],
-        where: { branchId: { in: branchIds }, status: 'PROSES' },
-        _count: { id: true },
-      }),
     ])
 
     const closingMap = new Map(allClosings.map(c => [c.branchId, c]))
-    const pendingMap = new Map(allPendingCounts.map(p => [p.branchId, p._count.id]))
+    const pendingMap = new Map<string, { count: number; amount: number }>()
+    allPendingTx.forEach((t) => {
+      const cur = pendingMap.get(t.branchId) ?? { count: 0, amount: 0 }
+      cur.count++
+      cur.amount += t.totalAmount
+      pendingMap.set(t.branchId, cur)
+    })
 
     const branchStats = branches.map((branch) => {
       const transactions = allTransactions.filter(t => t.branchId === branch.id)
@@ -43,7 +48,8 @@ export async function GET(req: NextRequest) {
       const operationalExpenses = expenses.reduce((s, e) => s + e.amount, 0)
       const netIncome = grossIncome - operationalExpenses
       const closing = closingMap.get(branch.id) ?? null
-      const pendingCount = pendingMap.get(branch.id) ?? 0
+      const pendingCount = pendingMap.get(branch.id)?.count ?? 0
+      const pendingAmount = pendingMap.get(branch.id)?.amount ?? 0
 
       // Top services today
       const serviceMap: Record<string, { name: string; category: string; qty: number; revenue: number }> = {}
@@ -68,6 +74,7 @@ export async function GET(req: NextRequest) {
         isClosed: !!closing,
         closing,
         pendingCount,
+        pendingAmount,
         topServices,
       }
     })

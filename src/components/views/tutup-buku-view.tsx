@@ -211,9 +211,15 @@ function BranchClosingCard({ branchStat, date, onAddExpense, onClose }: {
         {/* Income breakdown */}
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between rounded-lg bg-emerald-50 dark:bg-emerald-950/30 px-3 py-2">
-            <span className="flex items-center gap-2 text-muted-foreground"><TrendingUp className="h-4 w-4" /> Pendapatan</span>
+            <span className="flex items-center gap-2 text-muted-foreground"><TrendingUp className="h-4 w-4" /> Pendapatan (Lunas)</span>
             <span className="font-bold tabular-nums">{formatRupiah(b.grossIncome)}</span>
           </div>
+          {b.pendingAmount > 0 && (
+            <div className="flex items-center justify-between rounded-lg bg-amber-50 dark:bg-amber-950/30 px-3 py-2">
+              <span className="flex items-center gap-2 text-muted-foreground"><Clock className="h-4 w-4" /> Belum Bayar ({b.pendingCount})</span>
+              <span className="font-bold tabular-nums text-amber-600">{formatRupiah(b.pendingAmount)}</span>
+            </div>
+          )}
           <div className="flex items-center justify-between rounded-lg bg-rose-50 dark:bg-rose-950/30 px-3 py-2">
             <span className="flex items-center gap-2 text-muted-foreground"><Wallet className="h-4 w-4" /> Pengeluaran</span>
             <span className="font-bold tabular-nums text-rose-600">{formatRupiah(b.operationalExpenses)}</span>

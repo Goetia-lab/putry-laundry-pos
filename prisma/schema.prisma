@@ -135,7 +135,9 @@ model DailyClosing {
   netIncome              Int
   transferredToMain      Int
   operationalFundRetained Int
-  status                 String   @default("CLOSED")
+  pendingAmount           Int      @default(0)
+  pendingCount            Int      @default(0)
+  status                  String   @default("CLOSED")
   closingTime            DateTime @default(now())
   notes                  String?
   createdAt              DateTime @default(now())
