@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { PageHeader, EmptyState } from '@/components/shared/ui-bits'
-import { formatRupiah, formatDateTime, formatTime, formatEstimatedDate } from '@/lib/format'
+import { formatRupiah, formatDate, formatDateTime, formatTime, formatEstimatedDate } from '@/lib/format'
 import { toast } from 'sonner'
 import {
   Receipt, Search, CheckCircle2, Check, Banknote, Printer, Trash2,
@@ -254,70 +254,78 @@ function TransactionDetail({ tx, onClose }: { tx: Transaction | null; onClose: (
         {/* Print receipt */}
         <div className="print-receipt rounded-lg border border-dashed p-4">
           <div className="text-center">
-            <p className="font-bold text-sm">PUTRY LAUNDRY</p>
+            <p className="font-bold text-sm tracking-widest">━━━ PUTRY LAUNDRY ━━━</p>
             <p className="text-[10px] text-muted-foreground">{tx.branch?.name}</p>
             {tx.branch?.address && <p className="text-[10px] text-muted-foreground">{tx.branch.address}</p>}
           </div>
           <Separator className="my-2" />
-          <div className="flex justify-between text-[10px]">
-            <span>No: {tx.invoiceNo}</span>
-            <span>{formatDateTime(tx.date)}</span>
+          <div className="space-y-1 text-[11px]">
+            <div className="flex justify-between"><span className="text-muted-foreground">No</span><span className="font-medium">{tx.invoiceNo}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Tgl</span><span>{formatDate(tx.date)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Pelanggan</span><span className="font-medium">{tx.customerName}</span></div>
+            {tx.customerPhone && <div className="flex justify-between"><span className="text-muted-foreground">HP</span><span>{tx.customerPhone}</span></div>}
+            <div className="flex justify-between"><span className="text-muted-foreground">Status</span><span className="font-semibold text-emerald-600">✅ {tx.paymentStatus === 'LUNAS' ? 'LUNAS' : 'BELUM BAYAR'}</span></div>
           </div>
-          <div className="text-[10px]">
-            <span>Customer: {tx.customerName}</span>
-            {tx.customerPhone && <span> · {tx.customerPhone}</span>}
-          </div>
-          {tx.status === 'PROSES' && tx.items && (
-            <div className="flex justify-between text-[10px] font-semibold">
-              <span>Estimasi Selesai:</span>
-              <span>{formatEstimatedDate(tx.date, tx.items).dateStr}</span>
-            </div>
-          )}
           <Separator className="my-2" />
-          <div className="space-y-1 text-[10px]">
+          <p className="text-[10px] text-muted-foreground mb-1">─ Pesanan ─</p>
+          <div className="space-y-1 text-[11px]">
             {tx.items?.map((item) => (
-              <div key={item.id} className="flex justify-between">
-                <span className="truncate pr-2">{item.serviceName}{item.variant ? ` (${item.variant})` : ''} x{item.quantity}</span>
-                <span className="tabular-nums">{formatRupiah(item.subtotal)}</span>
+              <div key={item.id}>
+                <div className="flex justify-between">
+                  <span className="truncate pr-2">{item.serviceName}{item.variant ? ` (${item.variant})` : ''}</span>
+                  <span className="tabular-nums font-medium">{formatRupiah(item.subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-[10px] text-muted-foreground pl-2">
+                  <span>{item.quantity} {item.unit}</span>
+                  <span></span>
+                </div>
               </div>
             ))}
           </div>
           <Separator className="my-2" />
           {(tx.discountPercent ?? 0) > 0 ? (
             <>
-              <div className="flex justify-between text-[10px]">
+              <div className="flex justify-between text-[11px]">
                 <span>SUBTOTAL</span>
                 <span className="tabular-nums">{formatRupiah(tx.subtotal ?? tx.totalAmount)}</span>
               </div>
-              <div className="flex justify-between text-[10px] text-emerald-700">
+              <div className="flex justify-between text-[11px] text-emerald-700">
                 <span>DISKON ({tx.discountPercent}%)</span>
                 <span className="tabular-nums">- {formatRupiah(tx.discountAmount ?? 0)}</span>
               </div>
-              <div className="flex justify-between font-bold text-[11px]">
+              <Separator className="my-1" />
+              <div className="flex justify-between font-bold text-[12px]">
                 <span>TOTAL</span>
-                <span className="tabular-nums">{formatRupiah(tx.totalAmount)}</span>
+                <span className="tabular-nums text-emerald-600">{formatRupiah(tx.totalAmount)}</span>
               </div>
             </>
           ) : (
-            <div className="flex justify-between font-bold text-[11px]">
+            <div className="flex justify-between font-bold text-[12px]">
               <span>TOTAL</span>
-              <span className="tabular-nums">{formatRupiah(tx.totalAmount)}</span>
+              <span className="tabular-nums text-emerald-600">{formatRupiah(tx.totalAmount)}</span>
             </div>
           )}
           {tx.paymentStatus === 'LUNAS' && (
             <>
-              <div className="flex justify-between text-[10px]">
-                <span>BAYAR</span>
-                <span className="tabular-nums">{formatRupiah(tx.paidAmount)}</span>
+              <Separator className="my-1" />
+              <div className="space-y-1 text-[11px]">
+                <div className="flex justify-between"><span className="text-muted-foreground">Bayar</span><span className="tabular-nums">{formatRupiah(tx.paidAmount)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Kembali</span><span className="tabular-nums font-medium">{formatRupiah(tx.changeAmount)}</span></div>
               </div>
+            </>
+          )}
+          {tx.status === 'PROSES' && tx.items && (
+            <>
+              <Separator className="my-2" />
               <div className="flex justify-between text-[10px]">
-                <span>KEMBALI</span>
-                <span className="tabular-nums">{formatRupiah(tx.changeAmount)}</span>
+                <span className="text-muted-foreground">Estimasi selesai</span>
+                <span className="font-medium">{formatEstimatedDate(tx.date, tx.items).dateStr}</span>
               </div>
             </>
           )}
           <Separator className="my-2" />
-          <p className="text-center text-[9px] text-muted-foreground">Terima kasih atas kunjungan Anda!</p>
+          <p className="text-center text-[10px] text-muted-foreground">Terima kasih 🙏</p>
+          <p className="text-center text-[9px] text-muted-foreground">Putry Laundry — {tx.branch?.name}</p>
         </div>
 
         {/* Customer info */}

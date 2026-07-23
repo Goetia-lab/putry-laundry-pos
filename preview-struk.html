@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Preview Struk WhatsApp</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:20px}
+.wa-chat{background:#e5ddd5;background-image:url(data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4c5b8' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E);padding:20px;border-radius:12px;max-width:380px;width:100%;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.wa-bubble{background:#fff;border-radius:8px 8px 8px 0;padding:12px 14px;box-shadow:0 1px 1px rgba(0,0,0,.08);font-size:13px;line-height:1.5;color:#111;position:relative;margin-bottom:6px}
+.wa-bubble::after{content:'';position:absolute;bottom:0;left:-8px;border:5px solid transparent;border-right-color:#fff;border-bottom-color:#fff}
+.wa-time{text-align:right;font-size:11px;color:#667781;margin-top:4px;display:flex;justify-content:flex-end;gap:4px;align-items:center}
+.wa-header{text-align:center;margin-bottom:8px}
+.wa-header .title{font-weight:700;font-size:13px;letter-spacing:1px}
+.wa-header .sub{font-size:11px;color:#667781}
+.sep{border:none;border-top:1px dashed #ccc;margin:6px 0}
+.line{display:flex;justify-content:space-between;font-size:12px;padding:1px 0}
+.total{font-weight:700;font-size:13px}
+.green{color:#06d6a0}
+.price{font-weight:600;font-variant-numeric:tabular-nums}
+.small{font-size:11px;color:#667781}
+.footer{text-align:center;font-size:11px;color:#667781;margin-top:6px}
+.deco{font-size:12px;color:#aaa;letter-spacing:0.5px}
+.wa-check{color:#53bdeb;font-size:11px}
+</style>
+</head>
+<body>
+<div class="wa-chat">
+  <div class="wa-bubble">
+    <div class="wa-header">
+      <div class="deco">━━━  PUTRY LAUNDRY  ━━━</div>
+      <div class="sub">Cabang: Mojosari</div>
+    </div>
+    <hr class="sep">
+    <div class="line"><span class="small">No</span><span>INV-001</span></div>
+    <div class="line"><span class="small">Tgl</span><span>22 Jul 2026</span></div>
+    <div class="line"><span class="small">Pelanggan</span><span>Budi Santoso</span></div>
+    <div class="line"><span class="small">Status</span><span style="color:#06d6a0;font-weight:600">✅ LUNAS</span></div>
+    <hr class="sep">
+    <div class="small" style="margin-bottom:4px">─ Pesanan ─</div>
+    <div class="line"><span>Cuci Kering</span><span class="price">45.000</span></div>
+    <div class="line"><span style="padding-left:12px;font-size:11px;color:#888">3 kg</span><span></span></div>
+    <div class="line"><span>Setrika</span><span class="price">30.000</span></div>
+    <div class="line"><span style="padding-left:12px;font-size:11px;color:#888">3 kg</span><span></span></div>
+    <hr class="sep">
+    <div class="line total"><span>TOTAL</span><span style="color:#06d6a0">Rp 75.000</span></div>
+    <hr class="sep">
+    <div class="line"><span class="small">Bayar</span><span class="price">Rp 80.000</span></div>
+    <div class="line"><span class="small">Kembali</span><span class="price">Rp 5.000</span></div>
+    <hr class="sep">
+    <div class="line small"><span>Estimasi selesai</span><span>24 Jul 2026</span></div>
+    <hr class="sep">
+    <div class="footer">
+      <div>Terima kasih 🙏</div>
+      <div>Putry Laundry — Mojosari</div>
+    </div>
+  </div>
+  <div class="wa-time">
+    <span>14.30</span>
+    <span class="wa-check">✓✓</span>
+  </div>
+</div>
+</body>
+</html>
