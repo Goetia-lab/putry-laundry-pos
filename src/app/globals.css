@@ -269,11 +269,11 @@ button, a, [role="button"], input, select, textarea {
     position: absolute;
     left: 0;
     top: 0;
-    width: 80mm;
-    padding: 4mm;
+    width: 72mm;
+    padding: 3mm;
     margin: 0;
     font-family: 'Courier New', monospace;
-    font-size: 11px;
+    font-size: 9px;
     color: #000;
     background: #fff;
   }

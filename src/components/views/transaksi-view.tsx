@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { PageHeader, EmptyState } from '@/components/shared/ui-bits'
-import { formatRupiah, formatDate, formatDateTime, formatTime, formatEstimatedDate } from '@/lib/format'
+import { formatRupiah, formatDateTime, formatTime, formatEstimatedDate } from '@/lib/format'
 import { toast } from 'sonner'
 import {
   Receipt, Search, CheckCircle2, Check, Banknote, Printer, Trash2,
@@ -261,7 +261,7 @@ function TransactionDetail({ tx, onClose }: { tx: Transaction | null; onClose: (
           <Separator className="my-2" />
           <div className="space-y-1 text-[11px]">
             <div className="flex justify-between"><span className="text-muted-foreground">No</span><span className="font-medium">{tx.invoiceNo}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Tgl</span><span>{formatDate(tx.date)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Tgl</span><span>{formatDateTime(tx.date)}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Pelanggan</span><span className="font-medium">{tx.customerName}</span></div>
             {tx.customerPhone && <div className="flex justify-between"><span className="text-muted-foreground">HP</span><span>{tx.customerPhone}</span></div>}
             <div className="flex justify-between"><span className="text-muted-foreground">Status</span><span className="font-semibold text-emerald-600">✅ {tx.paymentStatus === 'LUNAS' ? 'LUNAS' : 'BELUM BAYAR'}</span></div>

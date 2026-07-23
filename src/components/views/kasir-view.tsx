@@ -22,7 +22,7 @@ import { toast } from 'sonner'
 import {
   Search, Plus, Minus, Trash2, ShoppingCart, X, CheckCircle2,
   Package, ShoppingCart as CartIcon, Printer, Banknote, Clock,
-  UserCheck, UserPlus, ChevronsUpDown, Check, CalendarClock, Zap,
+  UserCheck, UserPlus, ChevronsUpDown, Check, CalendarClock, Zap, MessageSquare,
 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 
@@ -46,7 +46,7 @@ export function KasirView() {
   const [paymentStatus, setPaymentStatus] = useState<'LUNAS' | 'BELUM_BAYAR'>('LUNAS')
   const [notes, setNotes] = useState('')
   const [checkoutOpen, setCheckoutOpen] = useState(false)
-  const [lastInvoice, setLastInvoice] = useState<{ invoiceNo: string; total: number; paid: number; change: number; customerName: string; items: Array<{ variant?: string | null }> } | null>(null)
+  const [lastInvoice, setLastInvoice] = useState<{ invoiceNo: string; total: number; paid: number; change: number; customerName: string; customerPhone: string; items: Array<{ variant?: string | null; serviceName: string; quantity: number; unit: string; subtotal: number }> } | null>(null)
   const isMobile = useIsMobile()
   const [mobileTab, setMobileTab] = useState<'services' | 'cart'>('services')
 
@@ -139,7 +139,8 @@ export function KasirView() {
         paid: (res as { data: { invoiceNo: string; totalAmount: number; paidAmount: number; changeAmount: number } }).data.paidAmount,
         change: (res as { data: { invoiceNo: string; totalAmount: number; paidAmount: number; changeAmount: number; customerName: string } }).data.changeAmount,
         customerName: (res as { data: { invoiceNo: string; totalAmount: number; paidAmount: number; changeAmount: number; customerName: string } }).data.customerName,
-        items: items.map((i) => ({ variant: i.variant })),
+        customerPhone: customerPhone.trim(),
+        items: items.map((i) => ({ variant: i.variant, serviceName: i.serviceName, quantity: i.quantity, unit: i.unit, subtotal: i.subtotal })),
       })
       clearCart()
       setCustomerName('')
@@ -638,6 +639,46 @@ export function KasirView() {
               <Button variant="outline" className="w-full gap-2" onClick={() => window.print()}>
                 <Printer className="h-4 w-4" /> Cetak Struk
               </Button>
+              {lastInvoice.customerPhone && /^(62|08)/.test(lastInvoice.customerPhone.replace(/\D/g,'')) && (
+                <Button
+                  className="w-full gap-2"
+                  onClick={() => {
+                    const phone = lastInvoice.customerPhone.replace(/\D/g,'')
+                    const wa = (phone.startsWith('0') ? '62' + phone.slice(1) : phone.startsWith('62') ? phone : '62' + phone)
+                    const est = formatEstimatedDate(new Date().toISOString(), lastInvoice.items)
+                    const branchName = branches?.find(b => b.id === selectedBranch)?.name || ''
+                    const itemsStr = lastInvoice.items.map((i) =>
+                      `${i.serviceName}${i.variant ? ` (${i.variant})` : ''}\n   ${i.quantity} ${i.unit}  ${formatRupiah(i.subtotal)}`
+                    ).join('\n')
+                    const text = [
+                      `━━━ PUTRY LAUNDRY ━━━`,
+                      `Cabang: ${branchName}`,
+                      ``,
+                      `No    : ${lastInvoice.invoiceNo}`,
+                      `Tgl   : ${new Intl.DateTimeFormat('id-ID',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date())}`,
+                      `Status: ✅ LUNAS`,
+                      ``,
+                      `─ Pesanan ─`,
+                      ...lastInvoice.items.map((i) =>
+                        `${i.serviceName}${i.variant ? ` (${i.variant})` : ''}\n   ${i.quantity} ${i.unit}  ${formatRupiah(i.subtotal)}`
+                      ),
+                      `────────────────────────`,
+                      `TOTAL              ${formatRupiah(lastInvoice.total)}`,
+                      ``,
+                      `Bayar              ${formatRupiah(lastInvoice.paid)}`,
+                      `Kembali            ${formatRupiah(lastInvoice.change)}`,
+                      ``,
+                      `Estimasi selesai: ${est.dateStr}`,
+                      ``,
+                      `Terima kasih 🙏`,
+                      `Putry Laundry — ${branchName}`,
+                    ].join('\n')
+                    window.open(`https://wa.me/${wa}?text=${encodeURIComponent(text)}`, '_blank')
+                  }}
+                >
+                  <MessageSquare className="h-4 w-4" /> Bagikan ke WA
+                </Button>
+              )}
             </div>
           )}
         </DialogContent>
