@@ -161,7 +161,7 @@ export async function GET(req: NextRequest) {
           netIncome: totalNet,
           transactionCount: totalTransactions,
           operationalFundTotal,
-          grandTotalToMain: mainRecap?.grandTotal ?? (totalNet - operationalFundTotal),
+          grandTotalToMain: mainRecap?.grandTotal ?? totalNet,
           allClosed,
         },
       },

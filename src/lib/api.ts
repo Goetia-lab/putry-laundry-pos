@@ -100,7 +100,6 @@ export interface DailyClosing {
   transactionCount: number
   operationalExpenses: number
   netIncome: number
-  transferredToMain: number
   operationalFundRetained: number
   status: string
   closingTime: string

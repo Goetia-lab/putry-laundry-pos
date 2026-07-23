@@ -71,8 +71,7 @@ export async function POST(req: NextRequest) {
 
     const operationalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0)
     const netIncome = grossIncome - operationalExpenses
-    const transferredToMain = netIncome // full net goes to main recap
-    const operationalFundRetained = branch.operationalFundAmount // disbursed back to branch for next day
+    const operationalFundRetained = branch.operationalFundAmount // float untuk besok
 
     // Upsert daily closing
     const closing = await db.dailyClosing.upsert({
@@ -87,7 +86,6 @@ export async function POST(req: NextRequest) {
         transactionCount,
         operationalExpenses,
         netIncome,
-        transferredToMain,
         operationalFundRetained,
         status: 'CLOSED',
         notes: notes || null,
@@ -97,7 +95,6 @@ export async function POST(req: NextRequest) {
         transactionCount,
         operationalExpenses,
         netIncome,
-        transferredToMain,
         operationalFundRetained,
         status: 'CLOSED',
         notes: notes || null,
@@ -131,7 +128,7 @@ async function updateMainRecap(dateStr: string, recapDate: Date) {
   const totalExpenses = closings.reduce((s, c) => s + c.operationalExpenses, 0)
   const totalNetIncome = closings.reduce((s, c) => s + c.netIncome, 0)
   const totalOperationalFundDisbursed = closings.reduce((s, c) => s + c.operationalFundRetained, 0)
-  const grandTotal = totalNetIncome - totalOperationalFundDisbursed
+  const grandTotal = totalNetIncome
 
   return db.$transaction(async (tx) => {
     // Upsert main recap
@@ -167,7 +164,7 @@ async function updateMainRecap(dateStr: string, recapDate: Date) {
           expenses: c.operationalExpenses,
           netIncome: c.netIncome,
           operationalFundDisbursed: c.operationalFundRetained,
-          netToMain: c.netIncome - c.operationalFundRetained,
+          netToMain: c.netIncome,
         })),
       })
     }

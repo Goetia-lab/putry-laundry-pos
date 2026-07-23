@@ -140,7 +140,7 @@ export function TutupBukuView() {
                 <div className="flex justify-between text-base"><span className="font-semibold">Laba Bersih</span><span className="font-bold tabular-nums text-emerald-600">{formatRupiah(branchInDialog.netIncome)}</span></div>
                 <div className="mt-2 rounded-md bg-primary/10 p-2 text-xs">
                   <p className="font-medium text-primary">→ Masuk Rekap Utama: {formatRupiah(branchInDialog.netIncome)}</p>
-                  <p className="mt-0.5 text-muted-foreground">→ Disisihkan untuk operasional besok: {formatRupiah(branchInDialog.branch.operationalFundAmount)}</p>
+                  <p className="mt-0.5 text-muted-foreground">→ Dana operasional besok (float): {formatRupiah(branchInDialog.branch.operationalFundAmount)}</p>
                 </div>
               </div>
               <div className="grid gap-2">
@@ -256,13 +256,8 @@ function BranchClosingCard({ branchStat, date, onAddExpense, onClose }: {
               <span className="font-semibold tabular-nums">{formatRupiah(b.netIncome)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Dana operasional besok</span>
-              <span className="font-semibold tabular-nums text-amber-600">- {formatRupiah(b.branch.operationalFundAmount)}</span>
-            </div>
-            <Separator className="my-1" />
-            <div className="flex justify-between">
-              <span className="font-medium">Net masuk kas utama</span>
-              <span className="font-bold tabular-nums text-emerald-600">{formatRupiah(b.netIncome - b.branch.operationalFundAmount)}</span>
+              <span className="text-muted-foreground">Dana operasional besok (float)</span>
+              <span className="font-semibold tabular-nums text-amber-600">{formatRupiah(b.branch.operationalFundAmount)}</span>
             </div>
           </div>
         </div>

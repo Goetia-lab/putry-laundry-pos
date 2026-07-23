@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     const totalExpenses = closings.reduce((s, c) => s + c.operationalExpenses, 0)
     const totalNetIncome = closings.reduce((s, c) => s + c.netIncome, 0)
     const totalOperationalFundDisbursed = closings.reduce((s, c) => s + c.operationalFundRetained, 0)
-    const grandTotal = totalNetIncome - totalOperationalFundDisbursed
+    const grandTotal = totalNetIncome
 
     const recap = await db.$transaction(async (tx) => {
       const r = await tx.mainRecap.upsert({
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
             expenses: c.operationalExpenses,
             netIncome: c.netIncome,
             operationalFundDisbursed: c.operationalFundRetained,
-            netToMain: c.netIncome - c.operationalFundRetained,
+            netToMain: c.netIncome,
           })),
         })
       }
