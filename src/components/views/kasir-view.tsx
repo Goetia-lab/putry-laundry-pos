@@ -647,24 +647,24 @@ export function KasirView() {
                     const wa = (phone.startsWith('0') ? '62' + phone.slice(1) : phone.startsWith('62') ? phone : '62' + phone)
                     const est = formatEstimatedDate(new Date().toISOString(), lastInvoice.items)
                     const branchName = branches?.find(b => b.id === selectedBranch)?.name || ''
-                    const itemsStr = lastInvoice.items.map((i) =>
-                      `${i.serviceName}${i.variant ? ` (${i.variant})` : ''}\n   ${i.quantity} ${i.unit}  ${formatRupiah(i.subtotal)}`
+                    const tgl = new Intl.DateTimeFormat('id-ID',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date())
+                    const itemsBlock = lastInvoice.items.map((i) =>
+                      `• ${i.serviceName}${i.variant ? ` (${i.variant})` : ''} (${i.quantity} ${i.unit})     ${formatRupiah(i.subtotal)}`
                     ).join('\n')
                     const text = [
                       `━━━ PUTRY LAUNDRY ━━━`,
                       `Cabang: ${branchName}`,
                       ``,
-                      `No    : ${lastInvoice.invoiceNo}`,
-                      `Tgl   : ${new Intl.DateTimeFormat('id-ID',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date())}`,
-                      `Status: ✅ LUNAS`,
+                      `INVOICE   : ${lastInvoice.invoiceNo}`,
+                      `TANGGAL   : ${tgl}`,
+                      `PELANGGAN : ${lastInvoice.customerName}`,
+                      `STATUS    : ✅ LUNAS`,
                       ``,
-                      `─ Pesanan ─`,
-                      ...lastInvoice.items.map((i) =>
-                        `${i.serviceName}${i.variant ? ` (${i.variant})` : ''}\n   ${i.quantity} ${i.unit}  ${formatRupiah(i.subtotal)}`
-                      ),
-                      `────────────────────────`,
+                      `═══ PESANAN ═══`,
+                      ``,
+                      itemsBlock,
+                      ``,
                       `TOTAL              ${formatRupiah(lastInvoice.total)}`,
-                      ``,
                       `Bayar              ${formatRupiah(lastInvoice.paid)}`,
                       `Kembali            ${formatRupiah(lastInvoice.change)}`,
                       ``,
