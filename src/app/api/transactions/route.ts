@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
     const discountAmount = Math.round((subtotal * discountPct) / 100)
     const totalAmount = subtotal - discountAmount
 
-    const paid = Number(paidAmount) || totalAmount
+    const paid = paidAmount != null && paidAmount !== '' ? Number(paidAmount) : totalAmount
     const change = Math.max(0, paid - totalAmount)
 
     // H1: ✅ Retry loop — count-then-create, retry on P2002 race

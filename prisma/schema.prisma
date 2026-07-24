@@ -175,3 +175,12 @@ model MainRecapEntry {
   recap  MainRecap @relation(fields: [recapId], references: [id], onDelete: Cascade)
   branch Branch    @relation(fields: [branchId], references: [id])
 }
+
+model OwnerExpense {
+  id          String   @id @default(cuid())
+  date        DateTime @default(now())
+  amount      Int
+  category    String   @default("LAINNYA")
+  description String
+  createdAt   DateTime @default(now())
+}

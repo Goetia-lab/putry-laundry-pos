@@ -50,6 +50,25 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
+    // Get transaction to check if its date is already closed
+    const tx = await db.transaction.findUnique({ where: { id }, select: { branchId: true, date: true } })
+    if (!tx) {
+      return NextResponse.json({ success: false, error: 'Transaksi tidak ditemukan' }, { status: 404 })
+    }
+    // Check if there's a daily closing for this branch+date
+    const start = new Date(tx.date)
+    start.setHours(0, 0, 0, 0)
+    const end = new Date(tx.date)
+    end.setHours(23, 59, 59, 999)
+    const closing = await db.dailyClosing.findFirst({
+      where: {
+        branchId: tx.branchId,
+        closingDate: { gte: start, lte: end },
+      },
+    })
+    if (closing) {
+      return NextResponse.json({ success: false, error: 'Tidak bisa menghapus transaksi setelah tutup buku. Batalkan tutup buku terlebih dahulu.' }, { status: 400 })
+    }
     // Items will be cascade deleted
     await db.transaction.delete({ where: { id } })
     return NextResponse.json({ success: true })

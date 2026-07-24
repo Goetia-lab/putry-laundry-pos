@@ -84,108 +84,98 @@ export async function POST(req: NextRequest) {
     const netIncome = grossIncome - operationalExpenses
     const operationalFundRetained = branch.operationalFundAmount // float untuk besok
 
-    // Upsert daily closing
-    const closing = await db.dailyClosing.upsert({
-      where: {
-        branchId_closingDate: { branchId, closingDate },
-      },
-      create: {
-        branchId,
-        date: closingDate,
-        closingDate,
-        grossIncome,
-        transactionCount,
-        operationalExpenses,
-        netIncome,
-        transferredToMain: netIncome,
-        operationalFundRetained,
-        pendingAmount,
-        pendingCount,
-        status: 'CLOSED',
-        notes: notes || null,
-      },
-      update: {
-        grossIncome,
-        transactionCount,
-        operationalExpenses,
-        netIncome,
-        transferredToMain: netIncome,
-        operationalFundRetained,
-        pendingAmount,
-        pendingCount,
-        status: 'CLOSED',
-        notes: notes || null,
-        closingTime: new Date(),
-      },
-      include: { branch: true },
+    // Atomic: simpan closing + update MainRecap dalam 1 transaksi
+    const result = await db.$transaction(async (tx) => {
+      const closing = await tx.dailyClosing.upsert({
+        where: {
+          branchId_closingDate: { branchId, closingDate },
+        },
+        create: {
+          branchId,
+          date: closingDate,
+          closingDate,
+          grossIncome,
+          transactionCount,
+          operationalExpenses,
+          netIncome,
+          transferredToMain: netIncome,
+          operationalFundRetained,
+          pendingAmount,
+          pendingCount,
+          status: 'CLOSED',
+          notes: notes || null,
+        },
+        update: {
+          grossIncome,
+          transactionCount,
+          operationalExpenses,
+          netIncome,
+          transferredToMain: netIncome,
+          operationalFundRetained,
+          pendingAmount,
+          pendingCount,
+          status: 'CLOSED',
+          notes: notes || null,
+          closingTime: new Date(),
+        },
+        include: { branch: true },
+      })
+
+      // Get all daily closings for this date to update MainRecap
+      const allClosings = await tx.dailyClosing.findMany({
+        where: { closingDate },
+        include: { branch: true },
+      })
+
+      const totalGrossIncome = allClosings.reduce((s, c) => s + c.grossIncome, 0)
+      const totalExpenses = allClosings.reduce((s, c) => s + c.operationalExpenses, 0)
+      const totalNetIncome = allClosings.reduce((s, c) => s + c.netIncome, 0)
+      const totalOperationalFundDisbursed = allClosings.reduce((s, c) => s + c.operationalFundRetained, 0)
+
+      // Upsert main recap
+      const recap = await tx.mainRecap.upsert({
+        where: { recapDate: closingDate },
+        create: {
+          recapDate: closingDate,
+          totalGrossIncome,
+          totalExpenses,
+          totalNetIncome,
+          totalOperationalFundDisbursed,
+          grandTotal: totalNetIncome,
+          status: 'CLOSED',
+        },
+        update: {
+          totalGrossIncome,
+          totalExpenses,
+          totalNetIncome,
+          totalOperationalFundDisbursed,
+          grandTotal: totalNetIncome,
+        },
+      })
+
+      // Delete old entries and recreate
+      await tx.mainRecapEntry.deleteMany({ where: { recapId: recap.id } })
+
+      if (allClosings.length > 0) {
+        await tx.mainRecapEntry.createMany({
+          data: allClosings.map((c) => ({
+            recapId: recap.id,
+            branchId: c.branchId,
+            grossIncome: c.grossIncome,
+            expenses: c.operationalExpenses,
+            netIncome: c.netIncome,
+            operationalFundDisbursed: c.operationalFundRetained,
+            netToMain: c.netIncome,
+          })),
+        })
+      }
+
+      return closing
     })
 
-    // Now update/create the MainRecap for this date
-    await updateMainRecap(closingDateStr, closingDate)
-
-    return NextResponse.json({ success: true, data: closing })
+    return NextResponse.json({ success: true, data: result })
   } catch (error) {
     console.error('POST /api/daily-closing error:', error)
     return NextResponse.json({ success: false, error: 'Gagal melakukan tutup buku' }, { status: 500 })
   }
-}
-
-// Helper to update the main recap for a given date — H2: ✅ wrapped in $transaction for atomicity
-async function updateMainRecap(dateStr: string, recapDate: Date) {
-  const dayStart = new Date(`${dateStr}T00:00:00.000+07:00`)
-  const dayEnd = new Date(`${dateStr}T23:59:59.999+07:00`)
-
-  // Get all daily closings for this date (read-only — outside tx)
-  const closings = await db.dailyClosing.findMany({
-    where: { closingDate: recapDate },
-    include: { branch: true },
-  })
-
-  const totalGrossIncome = closings.reduce((s, c) => s + c.grossIncome, 0)
-  const totalExpenses = closings.reduce((s, c) => s + c.operationalExpenses, 0)
-  const totalNetIncome = closings.reduce((s, c) => s + c.netIncome, 0)
-  const totalOperationalFundDisbursed = closings.reduce((s, c) => s + c.operationalFundRetained, 0)
-  const grandTotal = totalNetIncome
-
-  return db.$transaction(async (tx) => {
-    // Upsert main recap
-    const recap = await tx.mainRecap.upsert({
-      where: { recapDate },
-      create: {
-        recapDate,
-        totalGrossIncome,
-        totalExpenses,
-        totalNetIncome,
-        totalOperationalFundDisbursed,
-        grandTotal,
-        status: 'CLOSED',
-      },
-      update: {
-        totalGrossIncome,
-        totalExpenses,
-        totalNetIncome,
-        totalOperationalFundDisbursed,
-        grandTotal,
-      },
-    })
-
-    // Delete old entries and create new ones (atomic within transaction)
-    await tx.mainRecapEntry.deleteMany({ where: { recapId: recap.id } })
-
-    if (closings.length > 0) {
-      await tx.mainRecapEntry.createMany({
-        data: closings.map((c) => ({
-          recapId: recap.id,
-          branchId: c.branchId,
-          grossIncome: c.grossIncome,
-          expenses: c.operationalExpenses,
-          netIncome: c.netIncome,
-          operationalFundDisbursed: c.operationalFundRetained,
-          netToMain: c.netIncome,
-        })),
-      })
-    }
-
-    return recap
-  })
 }
